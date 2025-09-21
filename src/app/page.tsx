@@ -1,6 +1,7 @@
 // file: src/app/page.tsx  (nur relevanter Ausschnitt)
 import Hero from "@/components/Hero";
 import { TeaserRow } from "@/components/TeaserBanner";
+import IntroBlurb from "@/components/IntroBlurb";   
 import GalleryGrid from "@/components/gallery/GalleryGrid";
 import AboutShort from "@/components/AboutShort";
 import BelowGalleryCta from "@/components/BelowGalleryCta";
@@ -18,6 +19,7 @@ export default function HomePage() {
     <main>
       <Hero />
       <AboutShort />
+      <IntroBlurb />
       <section className="px-4 sm:px-6 md:px-8">
         <GalleryGrid />
       </section>

@@ -25,11 +25,12 @@ body {
 }
 
 /* Global Scribble-Overlay (fixiert über die Seite) */
+/* src/app/globals.css */
 body {
-  background-image: url("/textures/paper_grain.png");
-  background-size: 512px 512px; /* oder 256px je nach Geschmack */
-  background-repeat: repeat;
+  background: #fff;         /* nur weiße Fläche */
+  background-image: none;   /* sicherheitshalber */
 }
+
 
 /* Typografie (next/font  in layout.tsx) */
 h1 { font-family: var(--font-marker), system-ui, sans-serif; font-weight: 700; line-height: 1.2; font-size: 3.75rem; }
