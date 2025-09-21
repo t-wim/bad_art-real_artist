@@ -1,26 +1,51 @@
+﻿/* Tailwind v4 */
 @import "tailwindcss";
 
+/* Farb-Tokens */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bart-bg: #FFFFFF;
+  --bart-text: #000000;
+  --bart-accent-green: #00FF00;
+  --bart-accent-pink: #FF2CA3;
+  --bart-accent-red: #FF0000;
+  --bart-secondary-purple: #8A2BE2;
+  --bart-secondary-blue: #1E90FF;
+  --bart-secondary-gray: #808080;
+    --font-misfits: "Permanent Marker", system-ui, sans-serif;
+  --font-glitch: "VT323", ui-monospace, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+html, body { height: 100%; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  position: relative;                 /*important for the Overlay */
+  background: var(--bart-bg);
+  color: var(--bart-text);
+  font-family: var(--font-comic, system-ui, sans-serif);
 }
+
+/* Global Scribble-Overlay (fixiert über die Seite) */
+body {
+  background-image: url("/textures/paper_grain.png");
+  background-size: 512px 512px; /* oder 256px je nach Geschmack */
+  background-repeat: repeat;
+}
+
+/* Typografie (next/font  in layout.tsx) */
+h1 { font-family: var(--font-marker), system-ui, sans-serif; font-weight: 700; line-height: 1.2; font-size: 3.75rem; }
+h2, nav, button { font-family: var(--font-comic), system-ui, sans-serif; font-size: 2.25rem; line-height: 1.3; }
+p, span { font-family: var(--font-gloria), system-ui, sans-serif; font-size: 1.125rem; line-height: 1.625; }
+.stats, .scoreboard { font-family: var(--font-vt323), ui-monospace, monospace; font-size: 1.5rem; }
+
+/* Mobile-first Feintuning (optional, kompatibel) */
+@media (max-width: 480px) {
+  body::before { opacity: 0.14; } /* dezenter auf sehr klein */
+}
+
+h1 { font-size: clamp(2rem, 6vw, 3.75rem); }
+h2 { font-size: clamp(1.375rem, 4.5vw, 2.25rem); }
+p, span { font-size: clamp(1rem, 2.6vw, 1.125rem); }
+
+/* Utility-Beispiele (bleiben Tailwind-Klassen in JSX) */
+/* .blurred-row { filter: blur(4px); opacity: .8; } */
+/* .badge, .event-title { font-size: 1.25rem; } */

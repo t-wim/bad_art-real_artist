@@ -1,0 +1,5 @@
+export const glitch = localFont({
+  src: [{ path: "./fonts/GlitchGoblin.woff2", weight: "400", style: "normal" }],
+  variable: "--font-glitch",
+  display: "swap",
+});

@@ -1,0 +1,26 @@
+{
+  "hof": {
+    "title": "Hall of Fame",
+    "manifest": "The worst art gets the brightest spotlight.",
+    "microcopy": "Hall of Fame — Coming soon. Spotlight on the worst.",
+    "icon": "/icons/spotlight.svg"
+  },
+  "upload": {
+    "title": "Upload",
+    "manifest": "Your bad art deserves a bad website.",
+    "microcopy": "Upload — Soon you can pin your own bad masterpiece.",
+    "icon": "/icons/upload.svg"
+  },
+  "voting": {
+    "title": "Voting",
+    "manifest": "Slap stickers on the chaos you love.",
+    "microcopy": "Voting — Sticker-slap chaos is on the way.",
+    "icon": "/icons/sticker-plus.svg"
+  },
+  "bonus": {
+    "title": "Hidden Bonus",
+    "manifest": "Secrets for the chosen few, locked in neon.",
+    "microcopy": "Hidden Bonus — Exclusive meme stash for those verified. Soon.",
+    "icon": "/icons/lock-glitch.svg"
+  }
+}

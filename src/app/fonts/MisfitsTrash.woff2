@@ -1,0 +1,5 @@
+export const misfits = localFont({
+  src: [{ path: "./fonts/MisfitsTrash.woff2", weight: "400", style: "normal" }],
+  variable: "--font-misfits",
+  display: "swap",
+});
