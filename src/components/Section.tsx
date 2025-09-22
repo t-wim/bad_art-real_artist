@@ -1,17 +1,24 @@
-import React, { forwardRef } from "react";
+import {
+  forwardRef,
+  type ComponentPropsWithoutRef,
+  type ElementType,
+  type ForwardedRef,
+  type ReactElement,
+} from "react";
 
-type AsProp = keyof JSX.IntrinsicElements | React.JSXElementConstructor<any>;
-type Props<T extends AsProp> = {
+type AsProp = ElementType;
+
+type SectionProps<T extends AsProp> = {
   id?: string;
   className?: string;
   as?: T;
-} & Omit<React.ComponentPropsWithoutRef<T>, "as" | "className" | "id">;
+} & Omit<ComponentPropsWithoutRef<T>, "as" | "className" | "id">;
 
 function SectionInner<T extends AsProp = "section">(
-  { id, className = "", as, children, ...rest }: Props<T>,
-  ref: React.ForwardedRef<Element>
+  { id, className = "", as, children, ...rest }: SectionProps<T>,
+  ref: ForwardedRef<HTMLElement>
 ) {
-  const Tag = (as || "section") as any;
+  const Tag = (as ?? "section") as AsProp;
   return (
     <Tag
       ref={ref}
@@ -25,7 +32,7 @@ function SectionInner<T extends AsProp = "section">(
 }
 
 const Section = forwardRef(SectionInner) as <T extends AsProp = "section">(
-  p: Props<T> & { ref?: React.Ref<Element> }
-) => React.ReactElement | null;
+  props: SectionProps<T> & { ref?: ForwardedRef<HTMLElement> }
+) => ReactElement | null;
 
 export default Section;

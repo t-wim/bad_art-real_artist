@@ -1,101 +1,120 @@
-// file: src/components/gallery/GalleryGrid.tsx  (mit Frames)
 "use client";
-import { useEffect, useMemo, useState } from "react";
-// ❌ Alte Card nicht mehr nötig (wir rahmen direkt)
-// import ArtworkCard from "./ArtworkCard";
+
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { track } from "@/lib/analytics";
 import { getArtworks } from "@/lib/api";
 import type { TArtwork } from "@/lib/contracts";
 import { useViewTracker } from "@/hooks/useViewTracker";
 
-// Frames
 import "@/app/frames.css";
 import ArtCard from "@/components/ArtCard";
 
-function pickImageSrc(a: TArtwork): string | null {
-  // Versucht gängige Felder in sinnvoller Reihenfolge
-  // Passe ggf. an deine API an.
-  return (
-    (a as any).image?.src ??
-    (a as any).imageUrl ??
-    (a as any).image ??
-    (a as any).src ??
-    (a as any).url ??
-    (a as any).previewUrl ??
-    (a as any).media?.src ??
-    null
-  );
+type ArtworkWithMeta = TArtwork & {
+  image?: { src?: string | null } | null;
+  imageUrl?: string | null;
+  src?: string | null;
+  url?: string | null;
+  previewUrl?: string | null;
+  media?: { src?: string | null } | null;
+  alt?: string | null;
+  name?: string | null;
+};
+
+function resolveImageSource(artwork: ArtworkWithMeta): string | null {
+  const directFields = [artwork.imageUrl, artwork.src, artwork.url, artwork.previewUrl];
+  const fromDirect = directFields.find((value) => typeof value === "string" && value.trim().length > 0);
+  if (fromDirect) return fromDirect.trim();
+
+  const nestedSources = [artwork.image?.src, artwork.media?.src];
+  const fromNested = nestedSources.find((value) => typeof value === "string" && value.trim().length > 0);
+  if (fromNested) return fromNested.trim();
+
+  if (artwork.imageBase64) {
+    return `data:${artwork.mime};base64,${artwork.imageBase64}`;
+  }
+
+  return null;
 }
 
-function pickAlt(a: TArtwork): string {
+function resolveAltText(artwork: ArtworkWithMeta): string {
   return (
-    (a as any).alt ??
-    (a as any).title ??
-    (a as any).name ??
-    (a as any).id ??
-    ""
+    artwork.alt ??
+    artwork.title ??
+    artwork.name ??
+    artwork.id ??
+    "Artwork"
   );
 }
 
 export default function GalleryGrid() {
   const [items, setItems] = useState<TArtwork[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [err, setErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const ref = useViewTracker("view_gallery");
+  const isMounted = useRef(true);
+  const loadingRef = useRef(false);
 
-  // Initial load
   useEffect(() => {
-    let alive = true;
-    (async () => {
-      setLoading(true); setErr(null);
-      try {
-        const { items, nextCursor } = await getArtworks({ limit: 12, cursor: null });
-        if (!alive) return;
-        setItems(items);
-        setCursor(nextCursor ?? null);
-        track("gallery_load_success", { count: items.length, page: 1, source: "api" });
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e);
-        setErr(msg);
-        track("gallery_load_error", { message: msg });
-      } finally {
-        setLoading(false);
-      }
-    })();
-    return () => { alive = false; };
+    return () => {
+      isMounted.current = false;
+    };
   }, []);
 
-  const canMore = useMemo<boolean>(() => Boolean(cursor), [cursor]);
+  const loadPage = useCallback(
+    async (cursorValue: string | null, append: boolean) => {
+      if (!isMounted.current || loadingRef.current) return;
+      loadingRef.current = true;
+      setLoading(true);
+      setError(null);
+      try {
+        const { items: fetched, nextCursor } = await getArtworks({ limit: 12, cursor: cursorValue });
+        if (!isMounted.current) return;
+        setItems((prev) => (append ? [...prev, ...fetched] : fetched));
+        setCursor(nextCursor ?? null);
+        track("gallery_load_success", { count: fetched.length, page: append ? "next" : 1 });
+        if (append) {
+          track("gallery_load_more_click", { nextCursor });
+        }
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        if (isMounted.current) {
+          setError(message);
+        }
+        track("gallery_load_error", { message });
+      } finally {
+        if (isMounted.current) {
+          setLoading(false);
+        }
+        loadingRef.current = false;
+      }
+    },
+    []
+  );
 
-  async function onMore() {
+  useEffect(() => {
+    void loadPage(null, false);
+  }, [loadPage]);
+
+  const canLoadMore = useMemo(() => Boolean(cursor), [cursor]);
+
+  const handleLoadMore = async () => {
     if (!cursor || loading) return;
-    setLoading(true);
-    try {
-      const { items: more, nextCursor } = await getArtworks({ limit: 12, cursor });
-      setItems((prev: TArtwork[]) => [...prev, ...more]);
-      setCursor(nextCursor ?? null);
-      track("gallery_load_more_click", { nextCursor });
-      track("gallery_load_success", { count: more.length, source: "api" });
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      setErr(msg);
-      track("gallery_load_error", { message: msg });
-    } finally {
-      setLoading(false);
-    }
-  }
+    await loadPage(cursor, true);
+  };
 
   return (
-    <section ref={ref as any} id="gallery" className="py-8 sm:py-10 md:py-12">
+    <section ref={ref} id="gallery" className="py-8 sm:py-10 md:py-12">
       <h2 className="font-comic text-2xl mb-4 text-bart-black">Gallery</h2>
 
-      {err ? (
+      {error ? (
         <div className="border border-red-300 bg-red-50 text-red-700 p-4 rounded mb-4 font-comic">
-          Can’t load chaos: {err}{" "}
+          Can’t load chaos: {error}{" "}
           <button
             className="underline ml-2"
-            onClick={() => { setErr(null); void onMore(); }}
+            onClick={() => {
+              void loadPage(null, false);
+            }}
           >
             Retry
           </button>
@@ -103,15 +122,15 @@ export default function GalleryGrid() {
       ) : null}
 
       <div className="gallery-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-        {items.map((it: TArtwork) => {
-          const src = pickImageSrc(it);
-          const alt = pickAlt(it);
+        {items.map((item) => {
+          const enriched = item as ArtworkWithMeta;
+          const src = resolveImageSource(enriched);
+          const alt = resolveAltText(enriched);
 
-          // Wenn kein Bild ermittelbar ist, rendern wir nichts (oder einen Fallback)
           if (!src) {
             return (
               <div
-                key={(it as any).id ?? Math.random().toString(36)}
+                key={item.id}
                 className="border border-bart-gray/30 rounded-lg p-6 text-sm text-bart-gray"
               >
                 No image for this artwork.
@@ -121,12 +140,12 @@ export default function GalleryGrid() {
 
           return (
             <ArtCard
-              key={(it as any).id ?? src}
+              key={item.id}
               src={src}
               alt={alt}
-              color="duo"                           // alternativ: aus it.category ableiten
-              tiltDeg={1.6}                         // optional: z. B. (it as any).tiltDeg
-              jitter={{ right: "0.4deg", bottom: "-0.3deg" }} // optional
+              color="duo"
+              tiltDeg={1.6}
+              jitter={{ right: "0.4deg", bottom: "-0.3deg" }}
             />
           );
         })}
@@ -134,12 +153,12 @@ export default function GalleryGrid() {
 
       <div className="mt-6 flex justify-center">
         <button
-          disabled={!canMore || loading}
-          onClick={onMore}
+          disabled={!canLoadMore || loading}
+          onClick={() => void handleLoadMore()}
           className="font-comic px-4 py-2 rounded-md border border-bart-gray/40 bg-white hover:bg-bart-pink/10 disabled:opacity-40 disabled:cursor-not-allowed"
-          aria-disabled={!canMore || loading}
+          aria-disabled={!canLoadMore || loading}
         >
-          {loading ? "Loading…" : canMore ? "Load more" : "No more bad art"}
+          {loading ? "Loading…" : canLoadMore ? "Load more" : "No more bad art"}
         </button>
       </div>
     </section>

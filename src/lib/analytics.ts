@@ -18,5 +18,7 @@ export function track(type: AnalyticsEvent, payload?: Record<string, unknown>) {
 }
 export function onTrack(listener: Listener) {
   listeners.add(listener);
-  return () => listeners.delete(listener);
+  return () => {
+    listeners.delete(listener);
+  };
 }

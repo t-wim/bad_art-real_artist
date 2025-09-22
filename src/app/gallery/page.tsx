@@ -1,11 +1,11 @@
 // app/gallery/page.tsx  (oder src/app/gallery/page.tsx – aber nur EINER der beiden Orte!)
-import GalleryCard from '@/components/GalleryCard';
-import StickerSheet from '@/components/StickerSheet';
-import copy from '@/content/copy.json';
+import GalleryCard from "@/components/GalleryCard";
+import StickerSheet from "@/components/StickerSheet";
+import copy from "@/content/copy.json";
 
 export default function GalleryPage() {
-  const title = (copy as any)?.gallery?.title ?? 'Gallery';
-  const sub   = (copy as any)?.gallery?.subtext ?? 'Explore the chaos.';
+  const title = copy.gallery.title ?? "Gallery";
+  const sub = copy.gallery.subtext ?? "Explore the chaos.";
 
   return (
     <div className="min-h-screen p-6">

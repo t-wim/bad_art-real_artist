@@ -1,25 +1,45 @@
 // file: src/hooks/useViewTracker.ts
 "use client";
 import { useEffect, useRef } from "react";
-import { track, AnalyticsEvent } from "@/lib/analytics";
+import { track, type AnalyticsEvent } from "@/lib/analytics";
 
-export function useViewTracker(event: AnalyticsEvent, options: IntersectionObserverInit = { threshold: 0.4 }) {
+const DEFAULT_OPTIONS: IntersectionObserverInit = { threshold: 0.4 };
+
+export function useViewTracker(
+  event: AnalyticsEvent,
+  options: IntersectionObserverInit = DEFAULT_OPTIONS
+) {
   const ref = useRef<HTMLElement | null>(null);
+  const optionsRef = useRef<IntersectionObserverInit>(DEFAULT_OPTIONS);
+
+  useEffect(() => {
+    optionsRef.current = {
+      ...DEFAULT_OPTIONS,
+      ...options,
+      threshold: Array.isArray(options.threshold)
+        ? options.threshold.map((value) => Number(value))
+        : options.threshold ?? DEFAULT_OPTIONS.threshold,
+    };
+  }, [options]);
+
   useEffect(() => {
     const el = ref.current;
-    if (!el || typeof window === "undefined") return;
+    if (!el || typeof window === "undefined") return undefined;
+
     let seen = false;
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (!seen && e.isIntersecting) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!seen && entry.isIntersecting) {
           seen = true;
           track(event);
-          io.disconnect();
+          observer.disconnect();
         }
       });
-    }, options);
-    io.observe(el);
-    return () => io.disconnect();
-  }, [event, options.root, options.rootMargin, options.threshold]);
+    }, optionsRef.current);
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [event]);
+
   return ref;
 }
