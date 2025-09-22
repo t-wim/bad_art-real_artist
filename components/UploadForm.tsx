@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import React, { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { uploadImage } from "@/lib/upload";
 
 type Props = {
@@ -11,19 +11,20 @@ export default function UploadForm({ onDone }: Props) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     setError(null);
     setBusy(true);
     try {
-      const form = e.currentTarget;
-      const fileInput = form.elements.namedItem("file") as HTMLInputElement;
-      const file = fileInput.files?.[0];
+      const form = event.currentTarget;
+      const fileInput = form.elements.namedItem("file") as HTMLInputElement | null;
+      const file = fileInput?.files?.[0];
       if (!file) throw new Error("No file selected");
       const url = await uploadImage(file);
       onDone?.(url);
-    } catch (err: any) {
-      setError(err?.message ?? "Upload failed");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Upload failed";
+      setError(message);
     } finally {
       setBusy(false);
     }

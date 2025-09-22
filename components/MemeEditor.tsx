@@ -1,21 +1,22 @@
-﻿"use client";
+"use client";
 
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { applyCaption } from "@/lib/meme";
 
 type Props = {
-  src?: string;
   onExport?: (blob: Blob) => void;
 };
 
-export default function MemeEditor({ src, onExport }: Props) {
+export default function MemeEditor({ onExport }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [caption, setCaption] = useState("");
 
   async function handleExport() {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const blob = await new Promise<Blob>((res) => canvas.toBlob(b => b && res(b), "image/png"));
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob((value) => resolve(value), "image/png");
+    });
     if (blob) onExport?.(blob);
   }
 
@@ -24,7 +25,7 @@ export default function MemeEditor({ src, onExport }: Props) {
       <canvas ref={canvasRef} className="w-full rounded-xl border aspect-square" aria-label="Meme canvas" />
       <input
         value={caption}
-        onChange={(e) => setCaption(e.target.value)}
+        onChange={(event) => setCaption(event.target.value)}
         placeholder="Your caption…"
         className="rounded-lg border px-3 py-2 text-sm md:text-base"
       />

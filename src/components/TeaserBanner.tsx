@@ -3,11 +3,11 @@
 import Image from "next/image";
 import Section from "./Section";
 import TeaserBadge from "./TeaserBadge";
-import { track } from "@/lib/analytics";
+import { track, type AnalyticsEvent } from "@/lib/analytics";
 import { useEffect, useRef } from "react";
 
 type Variant = "hof" | "upload" | "voting" | "bonus";
-type TeaserProps = {
+export type TeaserProps = {
   variant: Variant;
   title: string;
   manifest: string;
@@ -32,9 +32,9 @@ export default function TeaserBanner({
   microcopy,
   backgroundTexture,
 }: TeaserProps) {
-  const hoverEvent =
+  const hoverEvent: AnalyticsEvent =
     variant === "bonus" ? "hover_glitch_bonus" : "hover_wobble_teaser";
-  const viewEvent =
+  const viewEvent: AnalyticsEvent =
     variant === "hof"
       ? "view_teaser_hof"
       : variant === "upload"
@@ -55,26 +55,32 @@ export default function TeaserBanner({
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const el = ref.current; if (!el) return;
+    const el = ref.current;
+    if (!el) return undefined;
+
     let seen = false;
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (!seen && e.isIntersecting) {
-          seen = true;
-          track(viewEvent as any);
-          io.disconnect();
-        }
-      });
-    }, { threshold: 0.5 });
-    io.observe(el);
-    return () => io.disconnect();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!seen && entry.isIntersecting) {
+            seen = true;
+            track(viewEvent);
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
   }, [viewEvent]);
 
   return (
     <article
       ref={ref}
       data-variant={variant}
-      onMouseEnter={() => track(hoverEvent as any, { variant })}
+      onMouseEnter={() => track(hoverEvent, { variant })}
       className={`group relative w-full text-left rounded-lg border border-bart-gray/30 bg-white/90 shadow-sm overflow-hidden ${animClass}`}
       aria-label={title}
       role="group"

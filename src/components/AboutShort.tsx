@@ -8,7 +8,7 @@ export default function AboutShort() {
   const ref = useViewTracker("view_about");
 
   return (
-    <Section ref={ref as any} id="about" className="py-12 md:py-16">
+    <Section ref={ref} id="about" className="py-12 md:py-16">
       <h2 className="font-marker text-3xl sm:text-4xl md:text-5xl leading-tight text-bart-black mb-4">
         About $BART
       </h2>
