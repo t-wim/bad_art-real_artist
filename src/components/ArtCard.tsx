@@ -1,6 +1,9 @@
 // file: src/components/ArtCard.tsx
 "use client";
 
+import Image from "next/image";
+import type { CSSProperties } from "react";
+
 type Color = "duo" | "pink" | "green";
 
 export type ArtCardProps = {
@@ -24,13 +27,18 @@ export default function ArtCard({
   className = "",
   jitter,
 }: ArtCardProps) {
-  const styleVars = {
+  type StyleVars = CSSProperties &
+    Partial<
+      Record<"--tilt" | "--jitter-left" | "--jitter-right" | "--jitter-bottom", string>
+    >;
+
+  const styleVars: StyleVars = {
     // CSS-Variablen für Rotation/Jitter
     // werden auf dem Frame-Wrapper gesetzt
-    ...(tiltDeg !== undefined ? { ["--tilt" as any]: `${tiltDeg}deg` } : {}),
-    ...(jitter?.left   ? { ["--jitter-left" as any]: jitter.left }   : {}),
-    ...(jitter?.right  ? { ["--jitter-right" as any]: jitter.right } : {}),
-    ...(jitter?.bottom ? { ["--jitter-bottom" as any]: jitter.bottom } : {}),
+    ...(tiltDeg !== undefined ? { "--tilt": `${tiltDeg}deg` } : {}),
+    ...(jitter?.left ? { "--jitter-left": jitter.left } : {}),
+    ...(jitter?.right ? { "--jitter-right": jitter.right } : {}),
+    ...(jitter?.bottom ? { "--jitter-bottom": jitter.bottom } : {}),
   };
 
   const frameClass =
@@ -43,7 +51,7 @@ export default function ArtCard({
 
   return (
     <div className={`art-card ${className}`}>
-      <div className="art-card__frame" style={styleVars as React.CSSProperties}>
+      <div className="art-card__frame" style={styleVars}>
         <div className={frameClass} {...dataColor}>
           {/* ======= Das eigentliche Markup der vier Rahmen-Seiten ======= */}
           <div className="frame-top frame-side" />
@@ -53,7 +61,14 @@ export default function ArtCard({
 
           {/* ======= Bild (gegenrotiert) ======= */}
           <div className="art-card__inner">
-            <img className="art-card__img" src={src} alt={alt} />
+            <Image
+              className="art-card__img"
+              src={src}
+              alt={alt}
+              width={1200}
+              height={1200}
+              sizes="(min-width: 768px) 33vw, 100vw"
+            />
           </div>
         </div>
       </div>

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Section from "./Section";
 import TeaserBadge from "./TeaserBadge";
-import { track } from "@/lib/analytics";
+import { track, type AnalyticsEvent } from "@/lib/analytics";
 import { useEffect, useRef } from "react";
 
 type Variant = "hof" | "upload" | "voting" | "bonus";
@@ -32,16 +32,15 @@ export default function TeaserBanner({
   microcopy,
   backgroundTexture,
 }: TeaserProps) {
-  const hoverEvent =
+  const hoverEvent: AnalyticsEvent =
     variant === "bonus" ? "hover_glitch_bonus" : "hover_wobble_teaser";
-  const viewEvent =
-    variant === "hof"
-      ? "view_teaser_hof"
-      : variant === "upload"
-      ? "view_teaser_upload"
-      : variant === "voting"
-      ? "view_teaser_voting"
-      : "view_teaser_bonus";
+  const viewEventMap: Record<Variant, AnalyticsEvent> = {
+    hof: "view_teaser_hof",
+    upload: "view_teaser_upload",
+    voting: "view_teaser_voting",
+    bonus: "view_teaser_bonus",
+  };
+  const viewEvent = viewEventMap[variant];
 
   const animClass =
     variant === "hof"
@@ -61,7 +60,7 @@ export default function TeaserBanner({
       entries.forEach((e) => {
         if (!seen && e.isIntersecting) {
           seen = true;
-          track(viewEvent as any);
+          track(viewEvent);
           io.disconnect();
         }
       });
@@ -74,7 +73,7 @@ export default function TeaserBanner({
     <article
       ref={ref}
       data-variant={variant}
-      onMouseEnter={() => track(hoverEvent as any, { variant })}
+      onMouseEnter={() => track(hoverEvent, { variant })}
       className={`group relative w-full text-left rounded-lg border border-bart-gray/30 bg-white/90 shadow-sm overflow-hidden ${animClass}`}
       aria-label={title}
       role="group"
