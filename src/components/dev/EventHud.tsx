@@ -10,12 +10,18 @@ export default function EventHud() {
   const [filter, setFilter] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    return onTrack((e) => {
-      if (paused) return;
-      setRows((r) => [...r, e].slice(-200));
-    });
-  }, [paused]);
+ useEffect(() => {
+  if (paused) return; // während Pause nichts abonnieren
+
+  const dispose = onTrack((e) => {
+    if (paused) return false;                 // explizit boolean
+    setRows((r) => [...r, e].slice(-200));
+    return true;
+  });
+
+  return () => { dispose(); };                // Cleanup als () => void
+}, [paused]);
+
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [rows.length]);
 

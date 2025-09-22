@@ -24,7 +24,7 @@ export default function SiteFooter() {
             href={X_MAIN}
             target="_blank"
             rel="noopener noreferrer"
-            title="Follow us on X @BARTShitpost"
+            title="Follow us on X @sleepyofsol"
             onClick={() => track("footer_click_x_main")}
           >
             <img

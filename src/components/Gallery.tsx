@@ -29,6 +29,7 @@ export default function Gallery() {
         </motion.div>
       ))}
     </div>
+    
   );
 }
 
