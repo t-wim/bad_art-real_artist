@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 
-type AsProp = keyof JSX.IntrinsicElements | React.JSXElementConstructor<any>;
+type AsProp = keyof JSX.IntrinsicElements | React.JSXElementConstructor<unknown>;
 type Props<T extends AsProp> = {
   id?: string;
   className?: string;
@@ -11,7 +11,7 @@ function SectionInner<T extends AsProp = "section">(
   { id, className = "", as, children, ...rest }: Props<T>,
   ref: React.ForwardedRef<Element>
 ) {
-  const Tag = (as || "section") as any;
+  const Tag = (as || "section") as React.ElementType;
   return (
     <Tag
       ref={ref}

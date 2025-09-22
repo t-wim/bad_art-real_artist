@@ -1,4 +1,5 @@
-﻿'use client';
+'use client';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 const mockArtworks = [
@@ -19,7 +20,14 @@ export default function Gallery() {
           className="relative bg-white p-4 rounded-lg shadow-lg transform rotate-1"
           style={{ border: '6px solid transparent', borderImage: 'url(/textures/crayon-green.png) 30 round' }}
         >
-          <img src={art.src} alt={art.title} className="w-full h-auto rounded" />
+          <Image
+            src={art.src}
+            alt={art.title}
+            width={300}
+            height={300}
+            className="w-full h-auto rounded"
+            sizes="(min-width: 768px) 33vw, 100vw"
+          />
           <p className="mt-2 text-[var(--bart-secondary-gray)]">
             {art.title}, 2025 – {art.artist}
           </p>
@@ -31,4 +39,3 @@ export default function Gallery() {
     </div>
   );
 }
-

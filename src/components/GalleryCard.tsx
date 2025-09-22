@@ -1,5 +1,6 @@
-﻿'use client';
+'use client';
 
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 
 export interface GalleryCardProps {
@@ -19,7 +20,14 @@ export default function GalleryCard({ src, title, artist, layoutId }: GalleryCar
       transition={{ duration: 0.5 }}
       layoutId={layoutId ?? `card-${src}`} /* stabil durch src */
     >
-      <img src={src} alt={title} className="w-full h-auto rounded" />
+      <Image
+        src={src}
+        alt={title}
+        width={1200}
+        height={1200}
+        className="w-full h-auto rounded"
+        sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 100vw"
+      />
       <p className="mt-2 text-sm text-[var(--bart-secondary-gray)]">
         {title}, 2025 – {artist}
       </p>
