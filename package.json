@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "framer-motion": "^12.23.16",
@@ -24,6 +27,9 @@
     "eslint": "9.0.0",
     "eslint-config-next": "^15.0.0",
     "postcss": "^8.0.0",
-    "tailwindcss": "^4.1.13"
+    "tailwindcss": "^4.1.13",
+    "prettier": "^3.3.3",
+    "vitest": "^2.0.5",
+    "msw": "^2.4.10"
   }
 }
