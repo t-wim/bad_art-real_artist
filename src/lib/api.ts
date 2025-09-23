@@ -48,9 +48,10 @@ async function fromApi(limit = DEFAULT_LIMIT, cursor?: string): Promise<TArtwork
 
     return ArtworkList.parse(safe);
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`[getArtworks] ${message}`);
     // Fallback: leere Liste statt Hard-Crash – UI bleibt renderbar
-    return ArtworkList.parse({ items: [], nextCursor: null, /* @note: error passt nicht in Schema */ } as any);
+    return ArtworkList.parse({ items: [], nextCursor: null });
   } finally {
     clearTimeout(to);
   }
@@ -113,22 +114,36 @@ function cycle<T>(arr: T[], count: number, offset = 0): T[] {
 }
 
 /** ---- Normalizer: gleicht key-casing & values an den Contract an ---- */
-function normalizeRawArtwork(x: any): TArtwork | null {
-  if (!x || typeof x !== "object") return null;
+type RawArtwork = Record<string, unknown>;
 
-  const id = x.id != null ? String(x.id) : "";
-  const title = x.title != null ? String(x.title) : "Untitled";
-  const author = x.author != null ? String(x.author) : undefined;
+function normalizeRawArtwork(raw: unknown): TArtwork | null {
+  if (!raw || typeof raw !== "object") return null;
 
-  const rawMime = (x.mime ?? x.MIME ?? x.contentType ?? "image/png").toString().toLowerCase();
+  const source = raw as RawArtwork;
+
+  const idValue = source.id;
+  const id = typeof idValue === "string" ? idValue : idValue != null ? String(idValue) : "";
+  const titleValue = source.title;
+  const title = typeof titleValue === "string" ? titleValue : titleValue != null ? String(titleValue) : "Untitled";
+  const authorValue = source.author;
+  const author =
+    authorValue == null
+      ? undefined
+      : typeof authorValue === "string"
+      ? authorValue
+      : String(authorValue);
+
+  const rawMimeValue = source.mime ?? source.MIME ?? source.contentType ?? "image/png";
+  const rawMime = String(rawMimeValue).toLowerCase();
   const mime: TArtwork["mime"] =
     rawMime.includes("jpeg") ? "image/jpeg" : rawMime.includes("webp") ? "image/webp" : "image/png";
 
   // akzeptiere mehrere Quell-Keys
-  const base64 = x.imageBase64 ?? x.imagebase64 ?? x.data ?? x.base64 ?? "";
-  const imageBase64 = String(base64);
+  const base64Source = source.imageBase64 ?? source.imagebase64 ?? source.data ?? source.base64 ?? "";
+  const imageBase64 = typeof base64Source === "string" ? base64Source : String(base64Source);
 
-  const createdAt = x.createdAt ? String(x.createdAt) : undefined;
+  const createdAtValue = source.createdAt;
+  const createdAt = createdAtValue == null ? undefined : String(createdAtValue);
 
   if (!id || !imageBase64) return null;
   return { id, title, author, mime, imageBase64, createdAt };
