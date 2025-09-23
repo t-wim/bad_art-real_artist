@@ -2,12 +2,10 @@
 // file: src/components/Hero.tsx (unchanged from previous delivery)
 // ==============================
 "use client";
-import { track } from "@/lib/analytics";
 import Section from "./Section";
 
 
 export default function Hero() {
-  const onHover = () => track("tooltip_seen_soon", { source: "hero_cta" });
   return (
     <div className="relative z-[1]">
       <Section className="py-10 sm:py-14 md:py-16">

@@ -1,0 +1,88 @@
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+./src/app/error.tsx
+27:11  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+./src/app/fonts.ts
+2:8  Error: 'localFont' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/not-found.tsx
+9:9  Error: Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+./src/app/page.tsx
+27:34  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/AboutShort.tsx
+11:26  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/ArtCard.tsx
+30:48  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+31:48  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+32:49  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+33:50  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+56:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/Gallery.tsx
+22:11  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/GalleryCard.tsx
+22:7  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/Hero.tsx
+10:9  Error: 'onHover' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/Section.tsx
+20:19  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+23:20  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/SiteFooter.tsx
+15:25  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+30:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+49:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+68:13  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/TeaserBanner.tsx
+64:30  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+77:47  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/hooks/useViewTracker.tsx
+23:6  Warning: React Hook useEffect has a missing dependency: 'options'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./src/lib/api.ts
+51:11  Error: 'msg' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+53:107  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+116:33  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/app/gallery/page.tsx
+7:26  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+8:26  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/gallery/ArtworkCard.tsx
+15:10  Error: 'url' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+16:11  Error: 'failed' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+16:19  Error: 'onLoad' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+16:27  Error: 'onError' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+39:44  Error: Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
+47:27  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+52:7  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/gallery/GalleryGrid.tsx
+19:11  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+20:11  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+21:11  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+22:11  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+23:11  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+24:11  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+25:11  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+32:11  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+33:11  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+34:11  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+35:11  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+90:26  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+114:29  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+124:27  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules

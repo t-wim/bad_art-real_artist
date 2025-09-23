@@ -1,101 +1,86 @@
 // file: src/components/gallery/GalleryGrid.tsx  (mit Frames)
 "use client";
-import { useEffect, useMemo, useState } from "react";
-// ❌ Alte Card nicht mehr nötig (wir rahmen direkt)
-// import ArtworkCard from "./ArtworkCard";
-import { track } from "@/lib/analytics";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import ArtCard from "@/components/ArtCard";
+import "@/app/frames.css";
+import { useViewTracker } from "@/hooks/useViewTracker";
 import { getArtworks } from "@/lib/api";
 import type { TArtwork } from "@/lib/contracts";
-import { useViewTracker } from "@/hooks/useViewTracker";
+import { track } from "@/lib/analytics";
 
-// Frames
-import "@/app/frames.css";
-import ArtCard from "@/components/ArtCard";
-
-function pickImageSrc(a: TArtwork): string | null {
-  // Versucht gängige Felder in sinnvoller Reihenfolge
-  // Passe ggf. an deine API an.
-  return (
-    (a as any).image?.src ??
-    (a as any).imageUrl ??
-    (a as any).image ??
-    (a as any).src ??
-    (a as any).url ??
-    (a as any).previewUrl ??
-    (a as any).media?.src ??
-    null
-  );
+function artworkSrc(item: TArtwork): string {
+  return `data:${item.mime};base64,${item.imageBase64}`;
 }
 
-function pickAlt(a: TArtwork): string {
-  return (
-    (a as any).alt ??
-    (a as any).title ??
-    (a as any).name ??
-    (a as any).id ??
-    ""
-  );
+function artworkAlt(item: TArtwork): string {
+  return item.title || item.id;
+}
+
+function jitterValue(min: number, max: number): string {
+  const value = Math.random() * (max - min) + min;
+  return `${value.toFixed(1)}deg`;
 }
 
 export default function GalleryGrid() {
   const [items, setItems] = useState<TArtwork[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [err, setErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const ref = useViewTracker("view_gallery");
 
-  // Initial load
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      setLoading(true); setErr(null);
-      try {
-        const { items, nextCursor } = await getArtworks({ limit: 12, cursor: null });
-        if (!alive) return;
-        setItems(items);
-        setCursor(nextCursor ?? null);
-        track("gallery_load_success", { count: items.length, page: 1, source: "api" });
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e);
-        setErr(msg);
-        track("gallery_load_error", { message: msg });
-      } finally {
-        setLoading(false);
-      }
-    })();
-    return () => { alive = false; };
-  }, []);
-
-  const canMore = useMemo<boolean>(() => Boolean(cursor), [cursor]);
-
-  async function onMore() {
-    if (!cursor || loading) return;
+  const loadArtworks = useCallback(async (requestedCursor: string | null) => {
     setLoading(true);
+    setError(null);
+
     try {
-      const { items: more, nextCursor } = await getArtworks({ limit: 12, cursor });
-      setItems((prev: TArtwork[]) => [...prev, ...more]);
+      const { items: nextItems, nextCursor } = await getArtworks({ limit: 12, cursor: requestedCursor ?? undefined });
+
+      if (requestedCursor) {
+        setItems((previous) => [...previous, ...nextItems]);
+        track("gallery_load_more_click", { nextCursor });
+        track("gallery_load_success", { count: nextItems.length, source: "api" });
+      } else {
+        setItems(nextItems);
+        track("gallery_load_success", { count: nextItems.length, page: 1, source: "api" });
+      }
+
       setCursor(nextCursor ?? null);
-      track("gallery_load_more_click", { nextCursor });
-      track("gallery_load_success", { count: more.length, source: "api" });
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      setErr(msg);
-      track("gallery_load_error", { message: msg });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
+      track("gallery_load_error", { message });
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    void loadArtworks(null);
+  }, [loadArtworks]);
+
+  const canLoadMore = useMemo(() => Boolean(cursor), [cursor]);
+
+  const handleLoadMore = () => {
+    if (!cursor || loading) {
+      return;
+    }
+
+    void loadArtworks(cursor);
+  };
 
   return (
-    <section ref={ref as any} id="gallery" className="py-8 sm:py-10 md:py-12">
+    <section ref={ref} id="gallery" className="py-8 sm:py-10 md:py-12">
       <h2 className="font-comic text-2xl mb-4 text-bart-black">Gallery</h2>
 
-      {err ? (
+      {error ? (
         <div className="border border-red-300 bg-red-50 text-red-700 p-4 rounded mb-4 font-comic">
-          Can’t load chaos: {err}{" "}
+          Can’t load chaos: {error}{" "}
           <button
             className="underline ml-2"
-            onClick={() => { setErr(null); void onMore(); }}
+            onClick={() => {
+              void loadArtworks(cursor);
+            }}
           >
             Retry
           </button>
@@ -103,43 +88,30 @@ export default function GalleryGrid() {
       ) : null}
 
       <div className="gallery-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-        {items.map((it: TArtwork) => {
-          const src = pickImageSrc(it);
-          const alt = pickAlt(it);
-
-          // Wenn kein Bild ermittelbar ist, rendern wir nichts (oder einen Fallback)
-          if (!src) {
-            return (
-              <div
-                key={(it as any).id ?? Math.random().toString(36)}
-                className="border border-bart-gray/30 rounded-lg p-6 text-sm text-bart-gray"
-              >
-                No image for this artwork.
-              </div>
-            );
-          }
-
-          return (
-            <ArtCard
-              key={(it as any).id ?? src}
-              src={src}
-              alt={alt}
-              color="duo"                           // alternativ: aus it.category ableiten
-              tiltDeg={1.6}                         // optional: z. B. (it as any).tiltDeg
-              jitter={{ right: "0.4deg", bottom: "-0.3deg" }} // optional
-            />
-          );
-        })}
+        {items.map((item, index) => (
+          <ArtCard
+            key={item.id}
+            src={artworkSrc(item)}
+            alt={artworkAlt(item)}
+            color={index % 3 === 0 ? "green" : index % 3 === 1 ? "pink" : "duo"}
+            tiltDeg={1.6}
+            jitter={{
+              left: jitterValue(-2, 2),
+              right: jitterValue(-2, 2),
+              bottom: jitterValue(-2, 2),
+            }}
+          />
+        ))}
       </div>
 
       <div className="mt-6 flex justify-center">
         <button
-          disabled={!canMore || loading}
-          onClick={onMore}
+          disabled={!canLoadMore || loading}
+          onClick={handleLoadMore}
           className="font-comic px-4 py-2 rounded-md border border-bart-gray/40 bg-white hover:bg-bart-pink/10 disabled:opacity-40 disabled:cursor-not-allowed"
-          aria-disabled={!canMore || loading}
+          aria-disabled={!canLoadMore || loading}
         >
-          {loading ? "Loading…" : canMore ? "Load more" : "No more bad art"}
+          {loading ? "Loading…" : canLoadMore ? "Load more" : "No more bad art"}
         </button>
       </div>
     </section>

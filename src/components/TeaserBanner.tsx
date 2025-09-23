@@ -1,13 +1,14 @@
 // file: src/components/TeaserBanner.tsx  (ICONS REMOVED)
 "use client";
 import Image from "next/image";
+import { useEffect, useMemo, useRef } from "react";
+
 import Section from "./Section";
 import TeaserBadge from "./TeaserBadge";
-import { track } from "@/lib/analytics";
-import { useEffect, useRef } from "react";
+import { track, type AnalyticsEvent } from "@/lib/analytics";
 
 type Variant = "hof" | "upload" | "voting" | "bonus";
-type TeaserProps = {
+export type TeaserItem = {
   variant: Variant;
   title: string;
   manifest: string;
@@ -15,7 +16,7 @@ type TeaserProps = {
   backgroundTexture?: string;
 };
 
-export function TeaserRow({ items }: { items: TeaserProps[] }) {
+export function TeaserRow({ items }: { items: TeaserItem[] }) {
   return (
     <Section className="py-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
       {items.map((t) => (
@@ -31,10 +32,10 @@ export default function TeaserBanner({
   manifest,
   microcopy,
   backgroundTexture,
-}: TeaserProps) {
+}: TeaserItem) {
   const hoverEvent =
     variant === "bonus" ? "hover_glitch_bonus" : "hover_wobble_teaser";
-  const viewEvent =
+  const viewEvent: AnalyticsEvent =
     variant === "hof"
       ? "view_teaser_hof"
       : variant === "upload"
@@ -43,25 +44,30 @@ export default function TeaserBanner({
       ? "view_teaser_voting"
       : "view_teaser_bonus";
 
-  const animClass =
-    variant === "hof"
-      ? "hall-of-fame-poster"
-      : variant === "upload"
-      ? "upload-card"
-      : variant === "voting"
-      ? "voting-sticker"
-      : "hidden-bonus-poster";
+  const animClass = useMemo(() => {
+    switch (variant) {
+      case "hof":
+        return "hall-of-fame-poster";
+      case "upload":
+        return "upload-card";
+      case "voting":
+        return "voting-sticker";
+      default:
+        return "hidden-bonus-poster";
+    }
+  }, [variant]);
 
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const el = ref.current; if (!el) return;
+    const el = ref.current;
+    if (!el) return;
     let seen = false;
     const io = new IntersectionObserver((entries) => {
       entries.forEach((e) => {
         if (!seen && e.isIntersecting) {
           seen = true;
-          track(viewEvent as any);
+          track(viewEvent);
           io.disconnect();
         }
       });
@@ -74,7 +80,7 @@ export default function TeaserBanner({
     <article
       ref={ref}
       data-variant={variant}
-      onMouseEnter={() => track(hoverEvent as any, { variant })}
+      onMouseEnter={() => track(hoverEvent, { variant })}
       className={`group relative w-full text-left rounded-lg border border-bart-gray/30 bg-white/90 shadow-sm overflow-hidden ${animClass}`}
       aria-label={title}
       role="group"

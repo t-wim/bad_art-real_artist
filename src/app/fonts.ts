@@ -1,5 +1,4 @@
 // src/app/fonts.ts
-import localFont from "next/font/local";
 import {
   Permanent_Marker,
   Comic_Neue,
