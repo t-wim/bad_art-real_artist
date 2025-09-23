@@ -1,5 +1,4 @@
 // src/app/fonts.ts
-import localFont from "next/font/local";
 import {
   Permanent_Marker,
   Comic_Neue,
@@ -35,14 +34,4 @@ export const vt323 = VT323({
   display: "swap",
 });
 
-// Lokale Fonts — Pfade RELATIV zu dieser Datei!
-//export const misfits = localFont({
- // src: [{ path: "./fonts/MisfitsTrash.woff2", weight: "400", style: "normal" }],
- // display: "swap",
-//});
-
-//export const glitch = localFont({
- // src: [{ path: "./fonts/GlitchGoblin.woff2", weight: "400", style: "normal" }],
-//  variable: "--font-glitch",
-//  display: "swap",
-//});
+// Lokale Fonts — reaktivieren, sobald sie produktiv genutzt werden.

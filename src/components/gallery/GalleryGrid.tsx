@@ -12,33 +12,68 @@ import { useViewTracker } from "@/hooks/useViewTracker";
 import "@/app/frames.css";
 import ArtCard from "@/components/ArtCard";
 
-function pickImageSrc(a: TArtwork): string | null {
-  // Versucht gängige Felder in sinnvoller Reihenfolge
-  // Passe ggf. an deine API an.
-  return (
-    (a as any).image?.src ??
-    (a as any).imageUrl ??
-    (a as any).image ??
-    (a as any).src ??
-    (a as any).url ??
-    (a as any).previewUrl ??
-    (a as any).media?.src ??
-    null
-  );
+type ArtworkRecord = TArtwork & Record<string, unknown>;
+
+type UnknownRecord = Record<string, unknown>;
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === "object" && value !== null;
 }
 
-function pickAlt(a: TArtwork): string {
-  return (
-    (a as any).alt ??
-    (a as any).title ??
-    (a as any).name ??
-    (a as any).id ??
-    ""
-  );
+function readString(source: UnknownRecord, key: string): string | null {
+  const value = source[key];
+  return typeof value === "string" && value.trim() ? value : null;
+}
+
+function pickImageSrc(artwork: ArtworkRecord): string | null {
+  const nestedImage = artwork["image"];
+  if (isRecord(nestedImage)) {
+    const nestedSrc = readString(nestedImage, "src");
+    if (nestedSrc) return nestedSrc;
+  }
+
+  const directKeys = ["imageUrl", "image", "src", "url", "previewUrl"];
+  for (const key of directKeys) {
+    const value = readString(artwork, key);
+    if (value) return value;
+  }
+
+  const media = artwork["media"];
+  if (isRecord(media)) {
+    const mediaSrc = readString(media, "src");
+    if (mediaSrc) return mediaSrc;
+  }
+
+  if (artwork.imageBase64 && artwork.imageBase64.trim()) {
+    return `data:${artwork.mime};base64,${artwork.imageBase64}`;
+  }
+
+  return null;
+}
+
+function pickAlt(artwork: ArtworkRecord): string {
+  const candidates: Array<string | null> = [
+    readString(artwork, "alt"),
+    artwork.title,
+    readString(artwork, "name"),
+    artwork.id,
+  ];
+
+  for (const candidate of candidates) {
+    if (typeof candidate === "string" && candidate.trim()) {
+      return candidate;
+    }
+  }
+
+  return "";
+}
+
+function toArtworkRecord(item: TArtwork): ArtworkRecord {
+  return { ...item } as ArtworkRecord;
 }
 
 export default function GalleryGrid() {
-  const [items, setItems] = useState<TArtwork[]>([]);
+  const [items, setItems] = useState<ArtworkRecord[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [err, setErr] = useState<string | null>(null);
@@ -48,22 +83,25 @@ export default function GalleryGrid() {
   useEffect(() => {
     let alive = true;
     (async () => {
-      setLoading(true); setErr(null);
+      setLoading(true);
+      setErr(null);
       try {
-        const { items, nextCursor } = await getArtworks({ limit: 12, cursor: null });
+        const { items: fetched, nextCursor } = await getArtworks({ limit: 12, cursor: null });
         if (!alive) return;
-        setItems(items);
+        setItems(fetched.map(toArtworkRecord));
         setCursor(nextCursor ?? null);
-        track("gallery_load_success", { count: items.length, page: 1, source: "api" });
+        track("gallery_load_success", { count: fetched.length, page: 1, source: "api" });
       } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e);
-        setErr(msg);
-        track("gallery_load_error", { message: msg });
+        const message = e instanceof Error ? e.message : String(e);
+        setErr(message);
+        track("gallery_load_error", { message });
       } finally {
         setLoading(false);
       }
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, []);
 
   const canMore = useMemo<boolean>(() => Boolean(cursor), [cursor]);
@@ -73,21 +111,21 @@ export default function GalleryGrid() {
     setLoading(true);
     try {
       const { items: more, nextCursor } = await getArtworks({ limit: 12, cursor });
-      setItems((prev: TArtwork[]) => [...prev, ...more]);
+      setItems((prev) => [...prev, ...more.map(toArtworkRecord)]);
       setCursor(nextCursor ?? null);
       track("gallery_load_more_click", { nextCursor });
       track("gallery_load_success", { count: more.length, source: "api" });
     } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : String(e);
-      setErr(msg);
-      track("gallery_load_error", { message: msg });
+      const message = e instanceof Error ? e.message : String(e);
+      setErr(message);
+      track("gallery_load_error", { message });
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <section ref={ref as any} id="gallery" className="py-8 sm:py-10 md:py-12">
+    <section ref={ref} id="gallery" className="py-8 sm:py-10 md:py-12">
       <h2 className="font-comic text-2xl mb-4 text-bart-black">Gallery</h2>
 
       {err ? (
@@ -95,7 +133,10 @@ export default function GalleryGrid() {
           Can’t load chaos: {err}{" "}
           <button
             className="underline ml-2"
-            onClick={() => { setErr(null); void onMore(); }}
+            onClick={() => {
+              setErr(null);
+              void onMore();
+            }}
           >
             Retry
           </button>
@@ -103,15 +144,15 @@ export default function GalleryGrid() {
       ) : null}
 
       <div className="gallery-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-        {items.map((it: TArtwork) => {
-          const src = pickImageSrc(it);
-          const alt = pickAlt(it);
+        {items.map((item) => {
+          const src = pickImageSrc(item);
+          const alt = pickAlt(item);
 
           // Wenn kein Bild ermittelbar ist, rendern wir nichts (oder einen Fallback)
           if (!src) {
             return (
               <div
-                key={(it as any).id ?? Math.random().toString(36)}
+                key={`missing-${item.id}`}
                 className="border border-bart-gray/30 rounded-lg p-6 text-sm text-bart-gray"
               >
                 No image for this artwork.
@@ -121,11 +162,11 @@ export default function GalleryGrid() {
 
           return (
             <ArtCard
-              key={(it as any).id ?? src}
+              key={item.id}
               src={src}
               alt={alt}
-              color="duo"                           // alternativ: aus it.category ableiten
-              tiltDeg={1.6}                         // optional: z. B. (it as any).tiltDeg
+              color="duo" // alternativ: aus item.category ableiten
+              tiltDeg={1.6} // optional: z. B. item.tiltDeg
               jitter={{ right: "0.4deg", bottom: "-0.3deg" }} // optional
             />
           );
