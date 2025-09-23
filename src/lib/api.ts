@@ -38,7 +38,9 @@ async function fromApi(limit = DEFAULT_LIMIT, cursor?: string): Promise<TArtwork
     const json = await res.json();
 
     const safeItems = Array.isArray(json?.items)
-      ? (json.items.map(normalizeRawArtwork).filter(Boolean) as TArtwork[])
+      ? json.items
+          .map((item) => normalizeRawArtwork(item))
+          .filter((item): item is TArtwork => item !== null)
       : [];
 
     const safe: TArtworkList = {
@@ -47,10 +49,9 @@ async function fromApi(limit = DEFAULT_LIMIT, cursor?: string): Promise<TArtwork
     };
 
     return ArtworkList.parse(safe);
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
+  } catch {
     // Fallback: leere Liste statt Hard-Crash – UI bleibt renderbar
-    return ArtworkList.parse({ items: [], nextCursor: null, /* @note: error passt nicht in Schema */ } as any);
+    return ArtworkList.parse({ items: [], nextCursor: null });
   } finally {
     clearTimeout(to);
   }
@@ -113,23 +114,41 @@ function cycle<T>(arr: T[], count: number, offset = 0): T[] {
 }
 
 /** ---- Normalizer: gleicht key-casing & values an den Contract an ---- */
-function normalizeRawArtwork(x: any): TArtwork | null {
-  if (!x || typeof x !== "object") return null;
+function normalizeRawArtwork(raw: unknown): TArtwork | null {
+  if (!raw || typeof raw !== "object") {
+    return null;
+  }
 
-  const id = x.id != null ? String(x.id) : "";
-  const title = x.title != null ? String(x.title) : "Untitled";
-  const author = x.author != null ? String(x.author) : undefined;
+  const data = raw as Record<string, unknown>;
 
-  const rawMime = (x.mime ?? x.MIME ?? x.contentType ?? "image/png").toString().toLowerCase();
-  const mime: TArtwork["mime"] =
-    rawMime.includes("jpeg") ? "image/jpeg" : rawMime.includes("webp") ? "image/webp" : "image/png";
+  const idValue = data.id;
+  const titleValue = data.title;
+  const authorValue = data.author;
+  const mimeValue = data.mime ?? data.MIME ?? data.contentType ?? "image/png";
+  const base64Value = data.imageBase64 ?? data.imagebase64 ?? data.data ?? data.base64 ?? "";
+  const createdAtValue = data.createdAt;
 
-  // akzeptiere mehrere Quell-Keys
-  const base64 = x.imageBase64 ?? x.imagebase64 ?? x.data ?? x.base64 ?? "";
-  const imageBase64 = String(base64);
+  const id = idValue != null ? String(idValue) : "";
+  const title = titleValue != null ? String(titleValue) : "Untitled";
+  const author = authorValue != null ? String(authorValue) : undefined;
+  const rawMime = String(mimeValue).toLowerCase();
+  const imageBase64 = typeof base64Value === "string" ? base64Value : String(base64Value);
+  const createdAt =
+    typeof createdAtValue === "string"
+      ? createdAtValue
+      : createdAtValue != null
+      ? String(createdAtValue)
+      : undefined;
 
-  const createdAt = x.createdAt ? String(x.createdAt) : undefined;
+  if (!id || !imageBase64) {
+    return null;
+  }
 
-  if (!id || !imageBase64) return null;
+  const mime: TArtwork["mime"] = rawMime.includes("jpeg")
+    ? "image/jpeg"
+    : rawMime.includes("webp")
+    ? "image/webp"
+    : "image/png";
+
   return { id, title, author, mime, imageBase64, createdAt };
 }

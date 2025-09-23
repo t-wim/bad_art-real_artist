@@ -1,11 +1,12 @@
 // app/gallery/page.tsx  (oder src/app/gallery/page.tsx – aber nur EINER der beiden Orte!)
-import GalleryCard from '@/components/GalleryCard';
-import StickerSheet from '@/components/StickerSheet';
-import copy from '@/content/copy.json';
+import GalleryCard from "@/components/GalleryCard";
+import StickerSheet from "@/components/StickerSheet";
+import copy from "@/content/copy.json";
 
 export default function GalleryPage() {
-  const title = (copy as any)?.gallery?.title ?? 'Gallery';
-  const sub   = (copy as any)?.gallery?.subtext ?? 'Explore the chaos.';
+  const {
+    gallery: { title, subtext },
+  } = copy;
 
   return (
     <div className="min-h-screen p-6">
@@ -13,7 +14,7 @@ export default function GalleryPage() {
         {title}
       </h1>
       <p className="text-lg text-[var(--bart-secondary-gray)] mb-12">
-        {sub}
+        {subtext}
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
