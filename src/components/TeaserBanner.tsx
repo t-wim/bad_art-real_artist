@@ -3,11 +3,11 @@
 import Image from "next/image";
 import Section from "./Section";
 import TeaserBadge from "./TeaserBadge";
-import { track } from "@/lib/analytics";
+import { track, type AnalyticsEvent } from "@/lib/analytics";
 import { useEffect, useRef } from "react";
 
 type Variant = "hof" | "upload" | "voting" | "bonus";
-type TeaserProps = {
+export type TeaserItem = {
   variant: Variant;
   title: string;
   manifest: string;
@@ -15,7 +15,7 @@ type TeaserProps = {
   backgroundTexture?: string;
 };
 
-export function TeaserRow({ items }: { items: TeaserProps[] }) {
+export function TeaserRow({ items }: { items: TeaserItem[] }) {
   return (
     <Section className="py-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
       {items.map((t) => (
@@ -31,41 +31,47 @@ export default function TeaserBanner({
   manifest,
   microcopy,
   backgroundTexture,
-}: TeaserProps) {
-  const hoverEvent =
+}: TeaserItem) {
+  const hoverEvent: AnalyticsEvent =
     variant === "bonus" ? "hover_glitch_bonus" : "hover_wobble_teaser";
-  const viewEvent =
+  const viewEvent: AnalyticsEvent =
     variant === "hof"
       ? "view_teaser_hof"
       : variant === "upload"
-      ? "view_teaser_upload"
-      : variant === "voting"
-      ? "view_teaser_voting"
-      : "view_teaser_bonus";
+        ? "view_teaser_upload"
+        : variant === "voting"
+          ? "view_teaser_voting"
+          : "view_teaser_bonus";
 
   const animClass =
     variant === "hof"
       ? "hall-of-fame-poster"
       : variant === "upload"
-      ? "upload-card"
-      : variant === "voting"
-      ? "voting-sticker"
-      : "hidden-bonus-poster";
+        ? "upload-card"
+        : variant === "voting"
+          ? "voting-sticker"
+          : "hidden-bonus-poster";
 
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const el = ref.current; if (!el) return;
+    const el = ref.current;
+    if (!el) return;
+
     let seen = false;
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (!seen && e.isIntersecting) {
-          seen = true;
-          track(viewEvent as any);
-          io.disconnect();
-        }
-      });
-    }, { threshold: 0.5 });
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!seen && entry.isIntersecting) {
+            seen = true;
+            track(viewEvent);
+            io.disconnect();
+          }
+        });
+      },
+      { threshold: 0.5 },
+    );
+
     io.observe(el);
     return () => io.disconnect();
   }, [viewEvent]);
@@ -74,7 +80,7 @@ export default function TeaserBanner({
     <article
       ref={ref}
       data-variant={variant}
-      onMouseEnter={() => track(hoverEvent as any, { variant })}
+      onMouseEnter={() => track(hoverEvent, { variant })}
       className={`group relative w-full text-left rounded-lg border border-bart-gray/30 bg-white/90 shadow-sm overflow-hidden ${animClass}`}
       aria-label={title}
       role="group"

@@ -10,24 +10,27 @@ export default function EventHud() {
   const [filter, setFilter] = useState("");
   const endRef = useRef<HTMLDivElement>(null);
 
- useEffect(() => {
-  if (paused) return; // während Pause nichts abonnieren
+  useEffect(() => {
+    if (paused) return; // während Pause nichts abonnieren
 
-  const dispose = onTrack((e) => {
-    if (paused) return false;                 // explizit boolean
-    setRows((r) => [...r, e].slice(-200));
-    return true;
-  });
+    const dispose = onTrack((e) => {
+      if (paused) return false; // explizit boolean
+      setRows((r) => [...r, e].slice(-200));
+      return true;
+    });
 
-  return () => { dispose(); };                // Cleanup als () => void
-}, [paused]);
+    return () => {
+      dispose();
+    }; // Cleanup als () => void
+  }, [paused]);
 
-
-  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [rows.length]);
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [rows.length]);
 
   const filtered = useMemo(
     () => rows.filter((r) => (filter ? r.type.includes(filter) : true)),
-    [rows, filter]
+    [rows, filter],
   );
 
   return (
@@ -40,10 +43,15 @@ export default function EventHud() {
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilter(e.target.value)}
           className="flex-1 text-xs px-2 py-1 border rounded"
         />
-        <button className="text-xs font-comic px-2 py-1 border rounded" onClick={() => setPaused((p: boolean) => !p)}>
+        <button
+          className="text-xs font-comic px-2 py-1 border rounded"
+          onClick={() => setPaused((p: boolean) => !p)}
+        >
           {paused ? "Resume" : "Pause"}
         </button>
-        <button className="text-xs font-comic px-2 py-1 border rounded" onClick={() => setRows([])}>Clear</button>
+        <button className="text-xs font-comic px-2 py-1 border rounded" onClick={() => setRows([])}>
+          Clear
+        </button>
         <button
           className="text-xs font-comic px-2 py-1 border rounded"
           onClick={() => navigator.clipboard.writeText(JSON.stringify(filtered, null, 2))}
@@ -56,7 +64,9 @@ export default function EventHud() {
           <div key={i} className="border-b border-bart-gray/10 py-1">
             <span className="font-bold">{r.type}</span>
             <span className="opacity-60"> · {new Date(r.ts).toLocaleTimeString()}</span>
-            {r.payload ? <pre className="whitespace-pre-wrap">{JSON.stringify(r.payload)}</pre> : null}
+            {r.payload ? (
+              <pre className="whitespace-pre-wrap">{JSON.stringify(r.payload)}</pre>
+            ) : null}
           </div>
         ))}
         <div ref={endRef} />

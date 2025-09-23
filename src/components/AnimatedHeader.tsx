@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from 'framer-motion';
-import copy from '@/content/copy.json';
+import { motion } from "framer-motion";
+import copy from "@/content/copy.json";
 
 export default function AnimatedHeader() {
   return (
@@ -32,13 +32,22 @@ export default function AnimatedHeader() {
           {copy.home.subtext}
         </p>
         <nav className="mt-6 flex justify-center gap-4">
-          <a href="#gallery" className="text-[var(--bart-secondary-blue)] hover:text-[var(--bart-accent-pink)]">
+          <a
+            href="#gallery"
+            className="text-[var(--bart-secondary-blue)] hover:text-[var(--bart-accent-pink)]"
+          >
             Gallery
           </a>
-          <a href="#upload" className="text-[var(--bart-secondary-blue)] hover:text-[var(--bart-accent-pink)]">
+          <a
+            href="#upload"
+            className="text-[var(--bart-secondary-blue)] hover:text-[var(--bart-accent-pink)]"
+          >
             Upload
           </a>
-          <a href="#about" className="text-[var(--bart-secondary-blue)] hover:text-[var(--bart-accent-pink)]">
+          <a
+            href="#about"
+            className="text-[var(--bart-secondary-blue)] hover:text-[var(--bart-accent-pink)]"
+          >
             About
           </a>
         </nav>

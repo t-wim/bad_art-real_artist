@@ -10,8 +10,12 @@ export default function Header() {
       <Section className="h-14 flex items-center justify-between">
         <span className="font-marker text-bart-pink text-xl">BART</span>
         <nav className="flex items-center gap-4 font-comic text-sm">
-          <a href="#gallery" className="hover:opacity-40">Gallery</a>
-          <a href="#about" className="hover:opacity-40">About</a>
+          <a href="#gallery" className="hover:opacity-40">
+            Gallery
+          </a>
+          <a href="#about" className="hover:opacity-40">
+            About
+          </a>
         </nav>
       </Section>
     </header>

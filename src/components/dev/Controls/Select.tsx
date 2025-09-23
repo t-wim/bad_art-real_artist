@@ -1,7 +1,10 @@
 // Select.tsx
 "use client";
 export default function Select({
-  label, value, onChange, options,
+  label,
+  value,
+  onChange,
+  options,
 }: {
   label: string;
   value: string;
@@ -16,7 +19,11 @@ export default function Select({
         value={value}
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onChange(e.target.value)}
       >
-        {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
       </select>
     </label>
   );

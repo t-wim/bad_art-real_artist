@@ -1,4 +1,4 @@
-// about/page.tsx 
+// about/page.tsx
 // src/app/about/page.tsx
 import type { Metadata } from "next";
 

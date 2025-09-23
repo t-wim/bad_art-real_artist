@@ -1,16 +1,19 @@
 // file: src/components/ArtCard.tsx
 "use client";
 
+import Image from "next/image";
+import type { CSSProperties } from "react";
+
 type Color = "duo" | "pink" | "green";
 
 export type ArtCardProps = {
   src: string;
   alt?: string;
-  color?: Color;          // "duo" | "pink" | "green"
-  tiltDeg?: number;       // überschreibt --frame-tilt
-  className?: string;     // zusätzliche Wrapper-Klassen
+  color?: Color; // "duo" | "pink" | "green"
+  tiltDeg?: number; // überschreibt --frame-tilt
+  className?: string; // zusätzliche Wrapper-Klassen
   jitter?: {
-    left?: string;        // z.B. "0.6deg"
+    left?: string; // z.B. "0.6deg"
     right?: string;
     bottom?: string;
   };
@@ -24,27 +27,30 @@ export default function ArtCard({
   className = "",
   jitter,
 }: ArtCardProps) {
-  const styleVars = {
-    // CSS-Variablen für Rotation/Jitter
-    // werden auf dem Frame-Wrapper gesetzt
-    ...(tiltDeg !== undefined ? { ["--tilt" as any]: `${tiltDeg}deg` } : {}),
-    ...(jitter?.left   ? { ["--jitter-left" as any]: jitter.left }   : {}),
-    ...(jitter?.right  ? { ["--jitter-right" as any]: jitter.right } : {}),
-    ...(jitter?.bottom ? { ["--jitter-bottom" as any]: jitter.bottom } : {}),
+  type FrameStyle = CSSProperties & {
+    "--tilt"?: string;
+    "--jitter-left"?: string;
+    "--jitter-right"?: string;
+    "--jitter-bottom"?: string;
   };
 
-  const frameClass =
-    color === "duo"
-      ? "crayon-frame duo"
-      : "crayon-frame";
+  const styleVars: FrameStyle = {
+    // CSS-Variablen für Rotation/Jitter
+    // werden auf dem Frame-Wrapper gesetzt
+    ...(tiltDeg !== undefined ? { "--tilt": `${tiltDeg}deg` } : {}),
+    ...(jitter?.left ? { "--jitter-left": jitter.left } : {}),
+    ...(jitter?.right ? { "--jitter-right": jitter.right } : {}),
+    ...(jitter?.bottom ? { "--jitter-bottom": jitter.bottom } : {}),
+  };
 
-  const dataColor =
-    color === "duo" ? {} : { "data-color": color };
+  const frameClass = color === "duo" ? "crayon-frame duo" : "crayon-frame";
+
+  const dataColor = color === "duo" ? undefined : color;
 
   return (
     <div className={`art-card ${className}`}>
-      <div className="art-card__frame" style={styleVars as React.CSSProperties}>
-        <div className={frameClass} {...dataColor}>
+      <div className="art-card__frame" style={styleVars}>
+        <div className={frameClass} data-color={dataColor}>
           {/* ======= Das eigentliche Markup der vier Rahmen-Seiten ======= */}
           <div className="frame-top frame-side" />
           <div className="frame-right frame-side" />
@@ -53,7 +59,15 @@ export default function ArtCard({
 
           {/* ======= Bild (gegenrotiert) ======= */}
           <div className="art-card__inner">
-            <img className="art-card__img" src={src} alt={alt} />
+            <Image
+              className="art-card__img"
+              src={src}
+              alt={alt}
+              width={800}
+              height={800}
+              sizes="(max-width: 768px) 100vw, 33vw"
+              unoptimized
+            />
           </div>
         </div>
       </div>

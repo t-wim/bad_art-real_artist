@@ -1,4 +1,4 @@
-// hall-of-fame/page.tsx 
+// hall-of-fame/page.tsx
 // src/app/about/page.tsx
 import type { Metadata } from "next";
 

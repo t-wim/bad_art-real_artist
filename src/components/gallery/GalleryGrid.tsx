@@ -12,29 +12,11 @@ import { useViewTracker } from "@/hooks/useViewTracker";
 import "@/app/frames.css";
 import ArtCard from "@/components/ArtCard";
 
-function pickImageSrc(a: TArtwork): string | null {
-  // Versucht gängige Felder in sinnvoller Reihenfolge
-  // Passe ggf. an deine API an.
-  return (
-    (a as any).image?.src ??
-    (a as any).imageUrl ??
-    (a as any).image ??
-    (a as any).src ??
-    (a as any).url ??
-    (a as any).previewUrl ??
-    (a as any).media?.src ??
-    null
-  );
-}
-
-function pickAlt(a: TArtwork): string {
-  return (
-    (a as any).alt ??
-    (a as any).title ??
-    (a as any).name ??
-    (a as any).id ??
-    ""
-  );
+function toDataUrl(artwork: TArtwork): string | null {
+  if (!artwork.imageBase64) return null;
+  return artwork.imageBase64.startsWith("data:")
+    ? artwork.imageBase64
+    : `data:${artwork.mime};base64,${artwork.imageBase64}`;
 }
 
 export default function GalleryGrid() {
@@ -48,7 +30,8 @@ export default function GalleryGrid() {
   useEffect(() => {
     let alive = true;
     (async () => {
-      setLoading(true); setErr(null);
+      setLoading(true);
+      setErr(null);
       try {
         const { items, nextCursor } = await getArtworks({ limit: 12, cursor: null });
         if (!alive) return;
@@ -63,7 +46,9 @@ export default function GalleryGrid() {
         setLoading(false);
       }
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, []);
 
   const canMore = useMemo<boolean>(() => Boolean(cursor), [cursor]);
@@ -73,7 +58,7 @@ export default function GalleryGrid() {
     setLoading(true);
     try {
       const { items: more, nextCursor } = await getArtworks({ limit: 12, cursor });
-      setItems((prev: TArtwork[]) => [...prev, ...more]);
+      setItems((prev) => [...prev, ...more]);
       setCursor(nextCursor ?? null);
       track("gallery_load_more_click", { nextCursor });
       track("gallery_load_success", { count: more.length, source: "api" });
@@ -87,7 +72,7 @@ export default function GalleryGrid() {
   }
 
   return (
-    <section ref={ref as any} id="gallery" className="py-8 sm:py-10 md:py-12">
+    <section ref={ref} id="gallery" className="py-8 sm:py-10 md:py-12">
       <h2 className="font-comic text-2xl mb-4 text-bart-black">Gallery</h2>
 
       {err ? (
@@ -95,7 +80,10 @@ export default function GalleryGrid() {
           Can’t load chaos: {err}{" "}
           <button
             className="underline ml-2"
-            onClick={() => { setErr(null); void onMore(); }}
+            onClick={() => {
+              setErr(null);
+              void onMore();
+            }}
           >
             Retry
           </button>
@@ -103,15 +91,14 @@ export default function GalleryGrid() {
       ) : null}
 
       <div className="gallery-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10">
-        {items.map((it: TArtwork) => {
-          const src = pickImageSrc(it);
-          const alt = pickAlt(it);
+        {items.map((item) => {
+          const src = toDataUrl(item);
+          const alt = item.title || item.id;
 
-          // Wenn kein Bild ermittelbar ist, rendern wir nichts (oder einen Fallback)
           if (!src) {
             return (
               <div
-                key={(it as any).id ?? Math.random().toString(36)}
+                key={item.id}
                 className="border border-bart-gray/30 rounded-lg p-6 text-sm text-bart-gray"
               >
                 No image for this artwork.
@@ -121,12 +108,12 @@ export default function GalleryGrid() {
 
           return (
             <ArtCard
-              key={(it as any).id ?? src}
+              key={item.id}
               src={src}
               alt={alt}
-              color="duo"                           // alternativ: aus it.category ableiten
-              tiltDeg={1.6}                         // optional: z. B. (it as any).tiltDeg
-              jitter={{ right: "0.4deg", bottom: "-0.3deg" }} // optional
+              color="duo" // alternativ: aus item.category ableiten
+              tiltDeg={1.6}
+              jitter={{ right: "0.4deg", bottom: "-0.3deg" }}
             />
           );
         })}
