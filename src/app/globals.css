@@ -3,22 +3,25 @@
 
 /* Farb-Tokens */
 :root {
-  --bart-bg: #FFFFFF;
+  --bart-bg: #ffffff;
   --bart-text: #000000;
-  --bart-accent-green: #00FF00;
-  --bart-accent-pink: #FF2CA3;
-  --bart-accent-red: #FF0000;
-  --bart-secondary-purple: #8A2BE2;
-  --bart-secondary-blue: #1E90FF;
+  --bart-accent-green: #00ff00;
+  --bart-accent-pink: #ff2ca3;
+  --bart-accent-red: #ff0000;
+  --bart-secondary-purple: #8a2be2;
+  --bart-secondary-blue: #1e90ff;
   --bart-secondary-gray: #808080;
-    --font-misfits: "Permanent Marker", system-ui, sans-serif;
+  --font-misfits: "Permanent Marker", system-ui, sans-serif;
   --font-glitch: "VT323", ui-monospace, monospace;
 }
 
-html, body { height: 100%; }
+html,
+body {
+  height: 100%;
+}
 
 body {
-  position: relative;                 /*important for the Overlay */
+  position: relative; /*important for the Overlay */
   background: var(--bart-bg);
   color: var(--bart-text);
   font-family: var(--font-comic, system-ui, sans-serif);
@@ -27,25 +30,53 @@ body {
 /* Global Scribble-Overlay (fixiert über die Seite) */
 /* src/app/globals.css */
 body {
-  background: #fff;         /* nur weiße Fläche */
-  background-image: none;   /* sicherheitshalber */
+  background: #fff; /* nur weiße Fläche */
+  background-image: none; /* sicherheitshalber */
 }
 
-
 /* Typografie (next/font  in layout.tsx) */
-h1 { font-family: var(--font-marker), system-ui, sans-serif; font-weight: 700; line-height: 1.2; font-size: 3.75rem; }
-h2, nav, button { font-family: var(--font-comic), system-ui, sans-serif; font-size: 2.25rem; line-height: 1.3; }
-p, span { font-family: var(--font-gloria), system-ui, sans-serif; font-size: 1.125rem; line-height: 1.625; }
-.stats, .scoreboard { font-family: var(--font-vt323), ui-monospace, monospace; font-size: 1.5rem; }
+h1 {
+  font-family: var(--font-marker), system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+  font-size: 3.75rem;
+}
+h2,
+nav,
+button {
+  font-family: var(--font-comic), system-ui, sans-serif;
+  font-size: 2.25rem;
+  line-height: 1.3;
+}
+p,
+span {
+  font-family: var(--font-gloria), system-ui, sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.625;
+}
+.stats,
+.scoreboard {
+  font-family: var(--font-vt323), ui-monospace, monospace;
+  font-size: 1.5rem;
+}
 
 /* Mobile-first Feintuning (optional, kompatibel) */
 @media (max-width: 480px) {
-  body::before { opacity: 0.14; } /* dezenter auf sehr klein */
+  body::before {
+    opacity: 0.14;
+  } /* dezenter auf sehr klein */
 }
 
-h1 { font-size: clamp(2rem, 6vw, 3.75rem); }
-h2 { font-size: clamp(1.375rem, 4.5vw, 2.25rem); }
-p, span { font-size: clamp(1rem, 2.6vw, 1.125rem); }
+h1 {
+  font-size: clamp(2rem, 6vw, 3.75rem);
+}
+h2 {
+  font-size: clamp(1.375rem, 4.5vw, 2.25rem);
+}
+p,
+span {
+  font-size: clamp(1rem, 2.6vw, 1.125rem);
+}
 
 /* Utility-Beispiele (bleiben Tailwind-Klassen in JSX) */
 /* .blurred-row { filter: blur(4px); opacity: .8; } */

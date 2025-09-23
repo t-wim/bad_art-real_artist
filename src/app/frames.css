@@ -3,17 +3,23 @@
    $BART — Crayon Frames v5 (OVERLAP, inside-fit)
    ============================== */
 
-:root{
+:root {
   --frame-tilt: 1.8deg;
   --frame-thickness: 22px;
   --layer-gap: 2px;
   --tape-scale: 1.15;
-  --tape-shadow: 0 3px 0 rgba(0,0,0,.12);
+  --tape-shadow: 0 3px 0 rgba(0, 0, 0, 0.12);
 }
 
 /* ===== Grid spacing (optional hook) ===== */
-.gallery-grid { gap: 2rem; }
-@media (min-width: 768px){ .gallery-grid { gap: 2.5rem; } }
+.gallery-grid {
+  gap: 2rem;
+}
+@media (min-width: 768px) {
+  .gallery-grid {
+    gap: 2.5rem;
+  }
+}
 
 /* ===== Card-Layering ===== */
 .art-card {
@@ -63,7 +69,8 @@
 .crayon-frame > .frame-top,
 .crayon-frame > .frame-bottom {
   height: var(--frame-thickness);
-  left: 0; right: 0;
+  left: 0;
+  right: 0;
   background-repeat: repeat-x, repeat-x;
   background-size:
     auto var(--frame-thickness),
@@ -75,14 +82,20 @@
 }
 
 /* Inside-fit: keine negativen Offsets */
-.crayon-frame > .frame-top    { top: 0; }
-.crayon-frame > .frame-bottom { bottom: 0; transform: rotate(var(--jitter-bottom, 0deg)); }
+.crayon-frame > .frame-top {
+  top: 0;
+}
+.crayon-frame > .frame-bottom {
+  bottom: 0;
+  transform: rotate(var(--jitter-bottom, 0deg));
+}
 
 /* Links/ rechts — 2 Layer dicht übereinander */
 .crayon-frame > .frame-left,
 .crayon-frame > .frame-right {
   width: var(--frame-thickness);
-  top: 0; bottom: 0;
+  top: 0;
+  bottom: 0;
   background-repeat: repeat-y, repeat-y;
   background-size:
     var(--frame-thickness) auto,
@@ -94,12 +107,20 @@
 }
 
 /* Inside-fit: keine negativen Offsets */
-.crayon-frame > .frame-left  { left: 0;  transform: rotate(var(--jitter-left, 0deg)); }
-.crayon-frame > .frame-right { right: 0; transform: rotate(var(--jitter-right, 0deg)); }
+.crayon-frame > .frame-left {
+  left: 0;
+  transform: rotate(var(--jitter-left, 0deg));
+}
+.crayon-frame > .frame-right {
+  right: 0;
+  transform: rotate(var(--jitter-right, 0deg));
+}
 
 /* ===== Extra überlappende Spur nur unten & rechts ===== */
 .crayon-frame > .frame-bottom,
-.crayon-frame > .frame-right { position: relative; }
+.crayon-frame > .frame-right {
+  position: relative;
+}
 
 .crayon-frame > .frame-bottom::after,
 .crayon-frame > .frame-right::after {
@@ -114,7 +135,8 @@
 
 /* unten: zweite X-Spur leicht nach rechts versetzt */
 .crayon-frame > .frame-bottom::after {
-  left: 0; right: 0;
+  left: 0;
+  right: 0;
   height: var(--frame-thickness);
   top: 0;
   transform: translateX(var(--layer-gap));
@@ -122,7 +144,8 @@
 
 /* rechts: zweite Y-Spur leicht nach unten versetzt */
 .crayon-frame > .frame-right::after {
-  top: 0; bottom: 0;
+  top: 0;
+  bottom: 0;
   width: var(--frame-thickness);
   right: 0;
   transform: translateY(var(--layer-gap));
@@ -135,15 +158,13 @@
 .crayon-frame.duo > .frame-left,
 .crayon-frame.duo > .frame-right {
   background-image:
-    url("/textures/crayon_border_pink.png"),
-    url("/textures/crayon_border_green.png");
+    url("/textures/crayon_border_pink.png"), url("/textures/crayon_border_green.png");
 }
 /* DUO – Zusatzspur unten & rechts */
 .crayon-frame.duo > .frame-bottom::after,
 .crayon-frame.duo > .frame-right::after {
   background-image:
-    url("/textures/crayon_border_pink.png"),
-    url("/textures/crayon_border_green.png");
+    url("/textures/crayon_border_pink.png"), url("/textures/crayon_border_green.png");
 }
 
 /* Single-Color – Hauptleisten */
@@ -152,16 +173,14 @@
 .crayon-frame:not(.duo)[data-color="green"] > .frame-left,
 .crayon-frame:not(.duo)[data-color="green"] > .frame-right {
   background-image:
-    url("/textures/crayon_border_green.png"),
-    url("/textures/crayon_border_green.png");
+    url("/textures/crayon_border_green.png"), url("/textures/crayon_border_green.png");
 }
 .crayon-frame:not(.duo)[data-color="pink"] > .frame-top,
 .crayon-frame:not(.duo)[data-color="pink"] > .frame-bottom,
 .crayon-frame:not(.duo)[data-color="pink"] > .frame-left,
 .crayon-frame:not(.duo)[data-color="pink"] > .frame-right {
   background-image:
-    url("/textures/crayon_border_pink.png"),
-    url("/textures/crayon_border_pink.png");
+    url("/textures/crayon_border_pink.png"), url("/textures/crayon_border_pink.png");
 }
 
 /* Single-Color – Zusatzspur */
@@ -188,7 +207,11 @@
   .crayon-frame > .frame-top,
   .crayon-frame > .frame-bottom,
   .crayon-frame > .frame-left,
-  .crayon-frame > .frame-right { transform: none !important; }
+  .crayon-frame > .frame-right {
+    transform: none !important;
+  }
   .art-card__frame,
-  .art-card__inner { transform: none !important; }
+  .art-card__inner {
+    transform: none !important;
+  }
 }

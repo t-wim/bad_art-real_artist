@@ -1,5 +1,6 @@
 // file: src/components/SiteFooter.tsx  (UPDATE — icons included)
 "use client";
+import Image from "next/image";
 import Section from "./Section";
 import { track } from "@/lib/analytics";
 import { useViewTracker } from "@/hooks/useViewTracker";
@@ -12,7 +13,7 @@ export default function SiteFooter() {
   const ref = useViewTracker("view_footer");
 
   return (
-    <footer ref={ref as any} className="mt-10 border-t border-bart-gray/20 bg-white/90">
+    <footer ref={ref} className="mt-10 border-t border-bart-gray/20 bg-white/90">
       <Section className="py-8 flex flex-col sm:flex-row items-start sm:items-center gap-4 justify-between">
         <div>
           <p className="font-comic text-bart-black">Join the chaos, spread the bad art.</p>
@@ -27,11 +28,11 @@ export default function SiteFooter() {
             title="Follow us on X @sleepyofsol"
             onClick={() => track("footer_click_x_main")}
           >
-            <img
+            <Image
               src="/icons/x.svg"
               alt=""
-              width={20}
-              height={20}
+              width={64}
+              height={64}
               aria-hidden="true"
               className="h-16 w-16 shrink-0"
             />
@@ -46,11 +47,11 @@ export default function SiteFooter() {
             title="Join the X Community"
             onClick={() => track("footer_click_x_community")}
           >
-            <img
+            <Image
               src="/icons/c.svg"
               alt=""
-              width={20}
-              height={20}
+              width={64}
+              height={64}
               aria-hidden="true"
               className="h-16 w-16 shrink-0"
             />
@@ -65,11 +66,11 @@ export default function SiteFooter() {
             title="Track on Dexscreener"
             onClick={() => track("footer_click_dex")}
           >
-            <img
+            <Image
               src="/icons/dex.svg"
               alt=""
-              width={20}
-              height={20}
+              width={64}
+              height={64}
               aria-hidden="true"
               className="h-16 w-16 shrink-0"
             />

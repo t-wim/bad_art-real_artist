@@ -1,8 +1,14 @@
 // Toggle.tsx
 "use client";
 export default function Toggle({
-  label, value, onChange,
-}: { label: string; value: boolean; onChange: (v: boolean) => void }) {
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: boolean;
+  onChange: (v: boolean) => void;
+}) {
   return (
     <label className="flex items-center justify-between gap-3 text-sm">
       <span className="font-comic">{label}</span>

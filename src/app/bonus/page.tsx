@@ -15,7 +15,9 @@ export default function BonusPage() {
     <main className="min-h-dvh p-4 md:p-8 max-w-5xl mx-auto">
       <header className="mb-6">
         <h1 className="text-3xl md:text-5xl font-bold tracking-tight">Bonus Memes</h1>
-        <p className="text-sm md:text-base opacity-80">Connect your wallet to unlock weekly bonus drops.</p>
+        <p className="text-sm md:text-base opacity-80">
+          Connect your wallet to unlock weekly bonus drops.
+        </p>
       </header>
 
       <section className="grid gap-4 md:gap-6">
@@ -42,9 +44,15 @@ export default function BonusPage() {
         <div className="rounded-2xl border p-4 md:p-6">
           <h2 className="text-xl md:text-2xl font-semibold mb-2">Explore</h2>
           <div className="flex flex-wrap gap-2">
-            <Link href="/gallery" className="underline text-sm md:text-base">Gallery</Link>
-            <Link href="/hall-of-fame" className="underline text-sm md:text-base">Hall of Fame</Link>
-            <Link href="/submit" className="underline text-sm md:text-base">Submit a Meme</Link>
+            <Link href="/gallery" className="underline text-sm md:text-base">
+              Gallery
+            </Link>
+            <Link href="/hall-of-fame" className="underline text-sm md:text-base">
+              Hall of Fame
+            </Link>
+            <Link href="/submit" className="underline text-sm md:text-base">
+              Submit a Meme
+            </Link>
           </div>
         </div>
       </section>

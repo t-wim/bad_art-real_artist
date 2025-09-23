@@ -1,17 +1,17 @@
-﻿'use client';
+﻿"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 const stickers = [
-  { id: 1, src: '/stickers/+1.svg',          x: '10%', y: '20%', rotate: '5deg' },
-  { id: 2, src: '/stickers/pink-glow.svg',   x: '30%', y: '50%', rotate: '-3deg' },
-  { id: 3, src: '/stickers/holo-glitch.svg', x: '60%', y: '30%', rotate: '2deg' },
+  { id: 1, src: "/stickers/+1.svg", x: "10%", y: "20%", rotate: "5deg" },
+  { id: 2, src: "/stickers/pink-glow.svg", x: "30%", y: "50%", rotate: "-3deg" },
+  { id: 3, src: "/stickers/holo-glitch.svg", x: "60%", y: "30%", rotate: "2deg" },
 ];
 
 export default function StickerSheet({ className }: { className?: string }) {
   return (
     <div
-      className={`relative w-full h-64 bg-[var(--bart-secondary-gray)]/10 rounded-lg overflow-hidden ${className ?? ''}`}
+      className={`relative w-full h-64 bg-[var(--bart-secondary-gray)]/10 rounded-lg overflow-hidden ${className ?? ""}`}
     >
       {stickers.map((sticker) => (
         <motion.img

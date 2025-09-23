@@ -8,7 +8,7 @@ export default function AboutShort() {
   const ref = useViewTracker("view_about");
 
   return (
-    <Section ref={ref as any} id="about" className="py-12 md:py-16">
+    <Section ref={ref} id="about" className="py-12 md:py-16">
       <h2 className="font-marker text-3xl sm:text-4xl md:text-5xl leading-tight text-bart-black mb-4">
         About $BART
       </h2>
@@ -30,13 +30,15 @@ export default function AboutShort() {
         We celebrate the gloriously terrible, the unpolished, the real.
       </p>
       <p className="mt-3 font-comic text-bart-black/90">
-        $BART is the unholy shrine of shitpost art, where stick figures and smudged doodles reign supreme.
+        $BART is the unholy shrine of shitpost art, where stick figures and smudged doodles reign
+        supreme.
       </p>
       <p className="mt-3 font-comic text-bart-black/90">
         No pretentious galleries here—just raw, unfiltered creativity.
       </p>
       <p className="mt-3 font-comic text-bart-black">
-        Upload your worst, vote for chaos, and join the cult of imperfection. Coming soon to ruin the internet.
+        Upload your worst, vote for chaos, and join the cult of imperfection. Coming soon to ruin
+        the internet.
       </p>
     </Section>
   );

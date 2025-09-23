@@ -11,8 +11,17 @@ import SiteFooter from "@/components/SiteFooter";
 export const metadata: Metadata = {
   title: "BART — Bad Art, Real Artist.",
   description: "Truth lies in imperfection – Bad Art wins.",
-  openGraph: { title: "BART — Bad Art, Real Artist.", description: "Truth lies in imperfection – Bad Art wins.", images: ["/og.png"] },
-  twitter:   { card: "summary_large_image", title: "BART — Bad Art, Real Artist.", description: "Truth lies in imperfection – Bad Art wins.", images: ["/og.png"] }
+  openGraph: {
+    title: "BART — Bad Art, Real Artist.",
+    description: "Truth lies in imperfection – Bad Art wins.",
+    images: ["/og.png"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BART — Bad Art, Real Artist.",
+    description: "Truth lies in imperfection – Bad Art wins.",
+    images: ["/og.png"],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
