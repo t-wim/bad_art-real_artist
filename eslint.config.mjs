@@ -18,7 +18,18 @@ const eslintConfig = [
       "out/**",
       "build/**",
       "next-env.d.ts",
+      "legacy/**",
+      "archive/**",
+      "deprecated/**",
+      "**/*.generated.*",
     ],
+  },
+  {
+    files: ["src/components/gallery/GalleryGrid.tsx"],
+    rules: {
+      "react-hooks/exhaustive-deps": "error",
+      "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+    },
   },
 ];
 
