@@ -91,9 +91,25 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - **Invalid cursor:** pagination error notice surfaces; the same Load more action replays the request with the existing cursor.
 
 ### Linting Strategy
-- Added `.eslintignore` to exclude `legacy/**`, `archive/**`, `deprecated/**`, and generated files from global lint runs.
-- Introduced a gallery-focused override in `eslint.config.mjs` to enforce React hook exhaustiveness and unused-variable checks only where the redesign lives.
-- New `pnpm lint:gallery` script runs `eslint src/components/gallery/GalleryGrid.tsx --quiet`, giving a quick signal on the refreshed UI while the `.eslintignore` mirror keeps other tooling aligned (flat-config ESLint emits a benign warning when it sees the file).
+- Flat-config ignores now live in `eslint.config.js` so build artefacts, legacy folders, and generated files stay out of lint scope without extra warnings.
+- The gallery-focused override remains active to enforce React Hooks exhaustiveness and unused-variable checks where the redesign lives.
+- `pnpm lint:gallery` runs a focused eslint pass over the gallery helpers and grid while `pnpm lint` continues to invoke the global Next.js lint pipeline.
+
+## ESLint 9 (Flat Config) – Ignores
+`.eslintignore` wird nicht mehr gelesen. Ignores in `eslint.config.js` definieren:
+```js
+import { defineConfig, globalIgnores } from "eslint/config";
+export default defineConfig([
+  globalIgnores([".next/**","node_modules/**","dist/**","out/**","coverage/**",".vercel/**","public/**/*.min.js"]),
+  /* … */
+]);
+
+// Fallback (wenn `globalIgnores` nicht verfügbar ist)
+export default [
+  { ignores: [".next/**","node_modules/**","dist/**","out/**","coverage/**",".vercel/**","public/**/*.min.js"] },
+  /* … */
+];
+```
 
 ## Gallery – Key Stability
 
@@ -117,18 +133,13 @@ Lokal im Projekt ausführen:
 
 ```bash
 pnpm ignored-builds      # zeigt blockierte Pakete
-pnpm approve-builds      # öffnet die Auswahl
-# In der Liste: a (alle auswählen) oder Space pro Paket → Enter
+pnpm approve-builds      # öffnet die Auswahl (a=alle, Space=toggle, Enter=bestätigen)
 ```
 
 pnpm schreibt danach in deine `package.json` z. B.:
 
 ```json
-{
-  "pnpm": {
-    "onlyBuiltDependencies": ["sharp", "@swc/core", "esbuild", "prisma", "bcrypt"]
-  }
-}
+{ "pnpm": { "onlyBuiltDependencies": ["sharp","@swc/core","esbuild","prisma","bcrypt"] } }
 ```
 
 Commit & Push → Vercel-Build läuft ohne Prompt/Warning.

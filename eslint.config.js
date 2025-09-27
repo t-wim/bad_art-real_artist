@@ -1,29 +1,28 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
-import { FlatCompat } from "@eslint/eslintrc";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const { FlatCompat } = require("@eslint/eslintrc");
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
-const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+module.exports = [
   {
     ignores: [
-      "node_modules/**",
       ".next/**",
-      "out/**",
-      "build/**",
-      "next-env.d.ts",
-      "legacy/**",
-      "archive/**",
-      "deprecated/**",
+      ".vercel/**",
       "**/*.generated.*",
+      "archive/**",
+      "build/**",
+      "coverage/**",
+      "deprecated/**",
+      "dist/**",
+      "legacy/**",
+      "next-env.d.ts",
+      "node_modules/**",
+      "out/**",
+      "public/**/*.min.js",
     ],
   },
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     files: [
       "src/components/gallery/GalleryGrid.tsx",
@@ -38,5 +37,3 @@ const eslintConfig = [
     },
   },
 ];
-
-export default eslintConfig;

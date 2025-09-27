@@ -1,5 +1,0 @@
-# Ignore legacy code that predates the redesigned gallery
-legacy/**
-archive/**
-deprecated/**
-**/*.generated.*

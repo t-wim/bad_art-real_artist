@@ -9,7 +9,8 @@
     "lint": "next lint",
     "lint:gallery": "eslint src/components/gallery/GalleryGrid.tsx src/features/gallery src/lib/keyPolicy.ts src/lib/collections.ts --quiet",
     "ignored-builds": "pnpm ignored-builds",
-    "approve-builds": "pnpm approve-builds"
+    "approve-builds": "pnpm approve-builds",
+    "prebuild": "node scripts/check-only-built.js || true"
   },
   "dependencies": {
     "framer-motion": "^12.23.16",
@@ -28,5 +29,14 @@
     "eslint-config-next": "^15.0.0",
     "postcss": "^8.0.0",
     "tailwindcss": "^4.1.13"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp",
+      "@swc/core",
+      "esbuild",
+      "prisma",
+      "bcrypt"
+    ]
   }
 }
