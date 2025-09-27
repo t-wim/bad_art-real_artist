@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "lint:gallery": "eslint src/components/gallery/GalleryGrid.tsx src/features/gallery src/lib/keyPolicy.ts src/lib/collections.ts --quiet"
+    "lint:gallery": "eslint src/components/gallery/GalleryGrid.tsx src/features/gallery src/lib/keyPolicy.ts src/lib/collections.ts --quiet",
+    "ignored-builds": "pnpm ignored-builds",
+    "approve-builds": "pnpm approve-builds"
   },
   "dependencies": {
     "framer-motion": "^12.23.16",

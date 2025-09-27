@@ -110,3 +110,31 @@ setItems((prev) => mergePage(prev, next.items));
 ```
 
 > Always apply the key on the root node returned from `Array.prototype.map`, e.g. `<li key={getStableKey({ id: item.id })}>…</li>`.
+
+## Schnelllösung A — interaktiv (lokal)
+
+Lokal im Projekt ausführen:
+
+```bash
+pnpm ignored-builds      # zeigt blockierte Pakete
+pnpm approve-builds      # öffnet die Auswahl
+# In der Liste: a (alle auswählen) oder Space pro Paket → Enter
+```
+
+pnpm schreibt danach in deine `package.json` z. B.:
+
+```json
+{
+  "pnpm": {
+    "onlyBuiltDependencies": ["sharp", "@swc/core", "esbuild", "prisma", "bcrypt"]
+  }
+}
+```
+
+Commit & Push → Vercel-Build läuft ohne Prompt/Warning.
+
+**Hinweise**
+
+- pnpm ≥ 9 empfohlen. Bei älteren Versionen bitte aktualisieren.
+- Monorepo: Befehl im jeweiligen Workspace ausführen (z. B. `apps/web`), wenn die Builds dort auftreten.
+- Änderung rückgängig machen: Einträge aus `pnpm.onlyBuiltDependencies` entfernen und neu „approve-builds“ ausführen.
