@@ -94,3 +94,19 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 - Added `.eslintignore` to exclude `legacy/**`, `archive/**`, `deprecated/**`, and generated files from global lint runs.
 - Introduced a gallery-focused override in `eslint.config.mjs` to enforce React hook exhaustiveness and unused-variable checks only where the redesign lives.
 - New `pnpm lint:gallery` script runs `eslint src/components/gallery/GalleryGrid.tsx --quiet`, giving a quick signal on the refreshed UI while the `.eslintignore` mirror keeps other tooling aligned (flat-config ESLint emits a benign warning when it sees the file).
+
+## Gallery – Key Stability
+
+- `getStableKey({ id, scope?, cursor? })` centralises how list keys are built so that IDs stay deterministic across pagination, filters, and grouped views.
+- `dedupeBy(list, keyFn)` removes duplicate entries before they render, ensuring React never receives conflicting keys.
+- `assertUniqueKeys(list, keyFn, label?)` logs a development-only warning whenever duplicate keys slip through so collisions can be spotted early.
+- `mergePage(previous, incoming, options?)` combines paginated responses while running the dedupe guard, making repeated `Load more` interactions safe by default.
+
+```ts
+import { mergePage } from "@/features/gallery/mergePages";
+
+const next = await fetchNextPage();
+setItems((prev) => mergePage(prev, next.items));
+```
+
+> Always apply the key on the root node returned from `Array.prototype.map`, e.g. `<li key={getStableKey({ id: item.id })}>…</li>`.

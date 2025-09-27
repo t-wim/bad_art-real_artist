@@ -25,7 +25,13 @@ const eslintConfig = [
     ],
   },
   {
-    files: ["src/components/gallery/GalleryGrid.tsx"],
+    files: [
+      "src/components/gallery/GalleryGrid.tsx",
+      "src/features/gallery/**/*.ts",
+      "src/features/gallery/**/*.tsx",
+      "src/lib/keyPolicy.ts",
+      "src/lib/collections.ts",
+    ],
     rules: {
       "react-hooks/exhaustive-deps": "error",
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],

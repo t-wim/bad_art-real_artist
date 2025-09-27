@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "lint:gallery": "eslint src/components/gallery/GalleryGrid.tsx --quiet"
+    "lint:gallery": "eslint src/components/gallery/GalleryGrid.tsx src/features/gallery src/lib/keyPolicy.ts src/lib/collections.ts --quiet"
   },
   "dependencies": {
     "framer-motion": "^12.23.16",

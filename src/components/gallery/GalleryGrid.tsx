@@ -4,6 +4,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { createPortal } from "react-dom";
 import { track } from "@/lib/analytics";
+import { assertUniqueKeys } from "@/lib/collections";
+import { mergePage } from "@/features/gallery/mergePages";
+import { getStableKey } from "@/lib/keyPolicy";
 
 type ImageItem = {
   id: string;
@@ -284,12 +287,18 @@ export default function GalleryGrid() {
   const returnFocusRef = useRef<HTMLButtonElement | null>(null);
   const hoveredRef = useRef(new Set<string>());
 
+  const keyForItem = useCallback((item: ImageItem) => getStableKey({ id: item.id }), []);
+
+  useEffect(() => {
+    assertUniqueKeys(items, keyForItem, "MinimalGridGallery.items");
+  }, [items, keyForItem]);
+
   const loadInitial = useCallback(async () => {
     try {
       setInitialLoading(true);
       setGlobalError(null);
       const page = await fetchGalleryPage(null, PAGE_LIMIT);
-      setItems(page.items);
+      setItems(mergePage([], page.items));
       setCursor(page.nextCursor);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to load gallery";
@@ -329,7 +338,7 @@ export default function GalleryGrid() {
       setLoadingMore(true);
       setPaginationError(null);
       const page = await fetchGalleryPage(cursorToUse, PAGE_LIMIT);
-      setItems((prev) => [...prev, ...page.items]);
+      setItems((prev) => mergePage(prev, page.items));
       setCursor(page.nextCursor);
       emit("grid_paginate", { count: page.items.length, cursor: cursorToUse });
     } catch (error) {
@@ -380,7 +389,7 @@ export default function GalleryGrid() {
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 md:gap-3 lg:grid-cols-6 xl:grid-cols-8">
           {items.map((item, index) => (
             <GalleryTile
-              key={item.id ?? `${item.src}-${index}`}
+              key={keyForItem(item)}
               item={item}
               index={index}
               onSelect={handleSelect}
