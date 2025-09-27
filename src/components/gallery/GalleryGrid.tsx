@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { createPortal } from "react-dom";
 import { track } from "@/lib/analytics";
@@ -156,7 +156,10 @@ function GalleryTile({ item, index, onSelect, onHover }: TileProps) {
           />
         )}
 
-        <div className="pointer-events-none absolute inset-0 flex flex-col justify-between bg-white/0 p-3 text-xs text-black/80 opacity-0 backdrop-blur-sm transition group-hover:bg-white/80 group-hover:opacity-100 group-focus-visible:bg-white/80 group-focus-visible:opacity-100">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 flex flex-col justify-between bg-white/0 p-3 text-xs text-black/80 opacity-0 backdrop-blur-sm transition group-hover:bg-white/80 group-hover:opacity-100 group-focus-visible:bg-white/80 group-focus-visible:opacity-100"
+        >
           <div className="text-sm font-medium text-black/90">{titleText}</div>
           <div className="flex items-center justify-between text-[11px] uppercase tracking-wide text-black/60">
             <span>{formattedHandle ?? "—"}</span>
@@ -176,6 +179,8 @@ type LightboxProps = {
 function LightboxModal({ item, onClose }: LightboxProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const closeRef = useRef<HTMLButtonElement | null>(null);
+  const titleId = useId();
+  const handleId = useId();
   const formattedHandle = formatHandle(item.handle);
   const titleText = item.title?.trim() || "Untitled";
 
@@ -238,7 +243,8 @@ function LightboxModal({ item, onClose }: LightboxProps) {
         ref={containerRef}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="minimal-grid-modal-title"
+        aria-labelledby={titleId}
+        aria-describedby={handleId}
         className="relative flex max-h-[90vh] w-full max-w-4xl flex-col overflow-hidden rounded-2xl border border-black/10 bg-white shadow-2xl"
       >
         <div className="relative flex-1 bg-black/5">
@@ -254,10 +260,12 @@ function LightboxModal({ item, onClose }: LightboxProps) {
           />
         </div>
         <div className="flex flex-col gap-2 border-t border-black/10 bg-white p-6 text-sm text-black/80">
-          <h2 id="minimal-grid-modal-title" className="text-lg font-semibold text-black/90">
+          <h2 id={titleId} className="text-lg font-semibold text-black/90">
             {titleText}
           </h2>
-          <p className="text-black/60">{formattedHandle ?? "Unknown artist"}</p>
+          <p id={handleId} className="text-black/60">
+            {formattedHandle ?? "Unknown artist"}
+          </p>
         </div>
         <div className="absolute right-4 top-4">
           <button
@@ -372,31 +380,28 @@ export default function GalleryGrid() {
       ) : null}
 
       {initialLoading ? (
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 md:gap-3 lg:grid-cols-6 xl:grid-cols-8">
+        <ul className="grid list-none grid-cols-2 gap-2 p-0 m-0 sm:grid-cols-3 md:grid-cols-4 md:gap-3 lg:grid-cols-6 xl:grid-cols-8">
           {Array.from({ length: 8 }).map((_, index) => (
-            <div
+            <li
               // eslint-disable-next-line react/no-array-index-key
               key={index}
               className="h-32 animate-pulse rounded-2xl border border-black/10 bg-black/5 md:h-36 lg:h-40"
+              aria-hidden="true"
             />
           ))}
-        </div>
+        </ul>
       ) : showEmptyState ? (
         <div className="flex items-center justify-center rounded-2xl border border-black/10 bg-white py-16 text-sm text-black/60">
           No images yet.
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 md:gap-3 lg:grid-cols-6 xl:grid-cols-8">
+        <ul className="grid list-none grid-cols-2 gap-2 p-0 m-0 sm:grid-cols-3 md:grid-cols-4 md:gap-3 lg:grid-cols-6 xl:grid-cols-8">
           {items.map((item, index) => (
-            <GalleryTile
-              key={keyForItem(item)}
-              item={item}
-              index={index}
-              onSelect={handleSelect}
-              onHover={handleHover}
-            />
+            <li key={keyForItem(item)} className="list-none">
+              <GalleryTile item={item} index={index} onSelect={handleSelect} onHover={handleHover} />
+            </li>
           ))}
-        </div>
+        </ul>
       )}
 
       {items.length > 0 ? (
