@@ -6,24 +6,45 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "lint:gallery": "eslint src/components/gallery/GalleryGrid.tsx src/features/gallery src/lib/keyPolicy.ts src/lib/collections.ts --quiet",
+    "ignored-builds": "pnpm ignored-builds",
+    "approve-builds": "pnpm approve-builds",
+    "prebuild": "node scripts/check-only-built.js || true"
   },
   "dependencies": {
     "framer-motion": "^12.23.16",
     "next": "^15.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "typescript": "^5.9.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "zod": "^4.1.9"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.13",
     "@types/node": "24.5.2",
-    "@types/react": "19.1.13",
+    "@types/react": "18.3.4",
+    "@types/react-dom": "18.3.0",
     "autoprefixer": "^10.0.0",
     "eslint": "9.0.0",
     "eslint-config-next": "^15.0.0",
     "postcss": "^8.0.0",
-    "tailwindcss": "^4.1.13"
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.9.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp",
+      "@swc/core",
+      "esbuild",
+      "prisma",
+      "bcrypt"
+    ],
+    "overrides": {
+      "@types/react": "18.3.4",
+      "@types/react-dom": "18.3.0"
+    }
+  },
+  "engines": {
+    "node": "20.x"
   }
 }
