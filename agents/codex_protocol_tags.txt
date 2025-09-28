@@ -1,0 +1,30 @@
+# Codex Module Protocol - Tags & Anwendung
+
+## Grundprinzip
+- Codex wählt logisch/intuitiv anhand der Eingabe (Intent-Heuristik).
+- Override jederzeit möglich über **[module:x.vy]** Tags.
+- Kurzbeschreibung & Anwendungsgebiet unten.
+
+---
+
+## Modull-1
+- [module:1.v1] → Linearer Leitfaden (Delivery & Betrieb: CI/CD, Roadmap, Releases)
+- [module:1.v2] → Missionszentrierte Orchestrierung (Ops & Social: Voting, TG/X-Mirroring, Runbooks)
+- [module:1.v3] → Baukastensystem (R&D: Feature-Experiment, Sketchpad, Minting)
+
+## Modull-2
+- [module:2.v1] → Architekturzentriert (Technisches Fundament: Webapp, API-Flows, Upload/Voting)
+- [module:2.v2] → Disziplinenorientiert (Community-Features: Galerie, Submissions, Content-Formate)
+- [module:2.v3] → Promptorientiert (Meme-Narrative & Automatisierung: Bots, Prompt-Layer, Social-Automation)
+
+## Modull-3
+- [module:3.v1] → Technisches Fundament (Core-Dev & Deployment: Next.js/Tailwind/Vercel, Quality-Gates)
+- [module:3.v2] → Community & Growth (Storytelling: $BART Meme-Atelier, User-Flows, Kommunikation)
+- [module:3.v3] → Agentisch-Modular (Automation: Bots, Prompt-Frameworks, AI-Assistenz, Experimente)
+
+---
+
+## Anwendung
+- **Auto-Routing:** Codex erkennt Keywords (deploy, poll, prompt, API, etc.) und wählt das passende Modul.
+- **Expliziter Override:** Tag am Anfang der Eingabe setzen, z. B. [module:2.v1].
+- **Fallback:** Bei Mehrdeutigkeit fragt Codex nach (z. B. „Kein eindeutiges Modul—[1.v1|1.v2|1.v3]?“).
