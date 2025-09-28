@@ -11,7 +11,7 @@ import { getStableKey } from "@/lib/keyPolicy";
 type ImageItem = {
   id: string;
   src: string;
-  alt?: string | null;
+  alt: string | null;
   title?: string | null;
   handle?: string | null;
   createdAt?: string | null;
@@ -51,26 +51,25 @@ async function fetchGalleryPage(cursor: string | null, limit: number): Promise<G
   };
 
   const rawItems = Array.isArray(json?.items) ? json.items : [];
-  const safeItems = rawItems
-    .map((raw) => {
-      if (!raw || typeof raw !== "object") return null;
-      const id = "id" in raw ? String(raw.id ?? "") : "";
-      const src = "src" in raw ? String(raw.src ?? "") : "";
-      if (!id || !src) return null;
-      return {
-        id,
-        src,
-        alt: raw.alt ?? null,
-        title: raw.title ?? null,
-        handle: raw.handle ?? null,
-        createdAt: raw.createdAt ?? null,
-        width: raw.width ?? null,
-        height: raw.height ?? null,
-        blurDataURL: raw.blurDataURL ?? null,
-        meta: raw.meta ?? null,
-      } satisfies ImageItem;
-    })
-    .filter((item): item is ImageItem => Boolean(item));
+  const safeItems = rawItems.reduce<ImageItem[]>((acc, raw) => {
+    if (!raw || typeof raw !== "object") return acc;
+    const id = "id" in raw ? String(raw.id ?? "") : "";
+    const src = "src" in raw ? String(raw.src ?? "") : "";
+    if (!id || !src) return acc;
+    acc.push({
+      id,
+      src,
+      alt: raw.alt ?? null,
+      title: raw.title ?? null,
+      handle: raw.handle ?? null,
+      createdAt: raw.createdAt ?? null,
+      width: raw.width ?? null,
+      height: raw.height ?? null,
+      blurDataURL: raw.blurDataURL ?? null,
+      meta: raw.meta ?? null,
+    });
+    return acc;
+  }, []);
 
   const safeCursor = json?.nextCursor == null ? null : String(json.nextCursor);
 

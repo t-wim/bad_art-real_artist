@@ -1,0 +1,11 @@
+.next/
+.vercel/
+legacy/**
+archive/**
+deprecated/**
+**/*.generated.*
+coverage/**
+dist/**
+out/**
+node_modules/**
+public/**/*.min.js
