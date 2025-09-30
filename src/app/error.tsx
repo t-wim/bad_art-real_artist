@@ -2,6 +2,7 @@
 // error.tsx 
 'use client';
 
+import Link from "next/link";
 import { useEffect } from 'react';
 
 export default function Error({
@@ -24,7 +25,9 @@ export default function Error({
           <button onClick={() => reset()} className="px-4 py-2 rounded-md border">
             Try again
           </button>
-          <a href="/" className="px-4 py-2 rounded-md border">Go home</a>
+          <Link href="/" className="px-4 py-2 rounded-md border">
+            Go home
+          </Link>
         </div>
       </div>
     </div>

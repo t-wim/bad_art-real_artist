@@ -1,0 +1,154 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  user
+  admin
+}
+
+enum SubmissionStatus {
+  pending
+  approved
+  rejected
+  shortlisted
+}
+
+enum RoundStatus {
+  draft
+  active
+  ended
+}
+
+enum VoteSource {
+  site
+  x
+}
+
+enum MilestoneKind {
+  t25
+  t50
+  t75
+  final
+}
+
+model User {
+  id        String   @id @default(cuid())
+  xId       String   @unique
+  handle    String   @unique
+  role      UserRole @default(user)
+  createdAt DateTime @default(now())
+
+  submissions Submission[]
+  votes       Vote[]
+}
+
+model Submission {
+  id        String           @id @default(cuid())
+  userId    String
+  imageUrl  String
+  handle    String
+  theme     String?
+  context   String?
+  status    SubmissionStatus @default(pending)
+  createdAt DateTime         @default(now())
+
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  candidate Candidate?
+}
+
+model Round {
+  id       String      @id @default(cuid())
+  status   RoundStatus @default(draft)
+  startsAt DateTime
+  endsAt   DateTime
+
+  candidates Candidate[]
+  votes      Vote[]
+  mirrors    Mirror[]
+  milestones Milestone[]
+  postLogs   PostLog[]
+}
+
+model Candidate {
+  id           String @id @default(cuid())
+  roundId      String
+  submissionId String
+  rankHint     Int?
+
+  round      Round      @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  votes      Vote[]
+
+  @@unique([roundId, submissionId])
+}
+
+model Vote {
+  id          String     @id @default(cuid())
+  roundId     String
+  candidateId String
+  userId      String?
+  source      VoteSource
+  createdAt   DateTime   @default(now())
+
+  round     Round     @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  candidate Candidate @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  user      User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([roundId, userId], map: "unique_round_user_vote")
+  @@index([createdAt])
+  @@index([roundId, candidateId])
+}
+
+model Mirror {
+  id         String   @id @default(cuid())
+  roundId    String
+  xPollId    String   @unique
+  lastSyncAt DateTime @default(now())
+
+  round Round @relation(fields: [roundId], references: [id], onDelete: Cascade)
+}
+
+model Milestone {
+  id          String        @id @default(cuid())
+  roundId     String
+  kind        MilestoneKind
+  triggeredAt DateTime      @default(now())
+
+  round    Round     @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  postLogs PostLog[] @relation("MilestonePostLogs")
+
+  @@unique([roundId, kind])
+}
+
+model PostLog {
+  id            String        @id @default(cuid())
+  roundId       String
+  milestoneKind MilestoneKind
+  xPostId       String        @unique
+  payloadJson   Json
+  createdAt     DateTime      @default(now())
+
+  round     Round      @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  milestone Milestone? @relation("MilestonePostLogs", fields: [roundId, milestoneKind], references: [roundId, kind], onDelete: Cascade)
+
+  @@index([createdAt])
+}
+
+model EventLog {
+  id        String   @id @default(cuid())
+  event     String
+  payload   Json?
+  userId    String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([event])
+}

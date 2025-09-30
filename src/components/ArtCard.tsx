@@ -1,50 +1,54 @@
 // file: src/components/ArtCard.tsx
 "use client";
 
-type Color = "duo" | "pink" | "green";
+import Image from "next/image";
+import { useMemo } from "react";
+import type { CSSProperties, KeyboardEvent } from "react";
 
-export type ArtCardProps = {
-  src: string;
-  alt?: string;
-  color?: Color;          // "duo" | "pink" | "green"
-  tiltDeg?: number;       // überschreibt --frame-tilt
-  className?: string;     // zusätzliche Wrapper-Klassen
-  jitter?: {
-    left?: string;        // z.B. "0.6deg"
-    right?: string;
-    bottom?: string;
-  };
+import type { Artwork } from "@/types/art";
+
+type FrameStyle = CSSProperties & {
+  "--tilt"?: string;
+  "--jitter-left"?: string;
+  "--jitter-right"?: string;
+  "--jitter-bottom"?: string;
 };
 
-export default function ArtCard({
-  src,
-  alt = "",
-  color = "duo",
-  tiltDeg,
-  className = "",
-  jitter,
-}: ArtCardProps) {
-  const styleVars = {
-    // CSS-Variablen für Rotation/Jitter
-    // werden auf dem Frame-Wrapper gesetzt
-    ...(tiltDeg !== undefined ? { ["--tilt" as any]: `${tiltDeg}deg` } : {}),
-    ...(jitter?.left   ? { ["--jitter-left" as any]: jitter.left }   : {}),
-    ...(jitter?.right  ? { ["--jitter-right" as any]: jitter.right } : {}),
-    ...(jitter?.bottom ? { ["--jitter-bottom" as any]: jitter.bottom } : {}),
-  };
+export interface ArtCardProps {
+  artwork: Artwork;
+  onSelect?: (id: string) => void;
+  className?: string;
+}
 
-  const frameClass =
-    color === "duo"
-      ? "crayon-frame duo"
-      : "crayon-frame";
+export default function ArtCard({ artwork, onSelect, className = "" }: ArtCardProps) {
+  const styleVars = useMemo<FrameStyle>(() => ({
+    "--tilt": "1.6deg",
+    "--jitter-right": "0.4deg",
+    "--jitter-bottom": "-0.3deg",
+  }), []);
 
-  const dataColor =
-    color === "duo" ? {} : { "data-color": color };
+  const altText = artwork.description ?? artwork.title;
+  const width = artwork.width ?? 1024;
+  const height = artwork.height ?? 1024;
+
+  const interactiveProps = onSelect
+    ? {
+        role: "button" as const,
+        tabIndex: 0,
+        onClick: () => onSelect(artwork.id),
+        onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            onSelect(artwork.id);
+          }
+        },
+      }
+    : {};
 
   return (
-    <div className={`art-card ${className}`}>
-      <div className="art-card__frame" style={styleVars as React.CSSProperties}>
-        <div className={frameClass} {...dataColor}>
+    <div className={`art-card ${className}`} {...interactiveProps}>
+      <div className="art-card__frame" style={styleVars}>
+        <div className="crayon-frame" data-color="duo">
           {/* ======= Das eigentliche Markup der vier Rahmen-Seiten ======= */}
           <div className="frame-top frame-side" />
           <div className="frame-right frame-side" />
@@ -53,7 +57,14 @@ export default function ArtCard({
 
           {/* ======= Bild (gegenrotiert) ======= */}
           <div className="art-card__inner">
-            <img className="art-card__img" src={src} alt={alt} />
+            <Image
+              className="art-card__img"
+              src={artwork.imageUrl}
+              alt={altText}
+              width={width}
+              height={height}
+              sizes="(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 90vw"
+            />
           </div>
         </div>
       </div>

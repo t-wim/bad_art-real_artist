@@ -4,12 +4,19 @@
 import Section from "./Section";
 import { useViewTracker } from "@/hooks/useViewTracker";
 
-export default function AboutShort() {
+type AboutShortProps = {
+  className?: string;
+};
+
+export default function AboutShort({ className = "" }: AboutShortProps) {
   const ref = useViewTracker("view_about");
+  const sectionClassName = ["py-12 md:py-16", className]
+    .filter((token): token is string => Boolean(token))
+    .join(" ");
 
   return (
-    <Section ref={ref as any} id="about" className="py-12 md:py-16">
-      <h2 className="font-marker text-3xl sm:text-4xl md:text-5xl leading-tight text-bart-black mb-4">
+    <Section ref={ref} id="about" className={sectionClassName}>
+      <h2 className="font-marker text-bart-black mb-4 text-3xl leading-tight sm:text-4xl md:text-5xl">
         About $BART
       </h2>
 
@@ -26,17 +33,19 @@ export default function AboutShort() {
         </video>
       </div>
 
-      <p className="font-comic text-bart-black text-[1.125rem] sm:text-[1.25rem] leading-relaxed">
+      <p className="font-comic text-bart-black text-[1.125rem] leading-relaxed sm:text-[1.25rem]">
         We celebrate the gloriously terrible, the unpolished, the real.
       </p>
-      <p className="mt-3 font-comic text-bart-black/90">
-        $BART is the unholy shrine of shitpost art, where stick figures and smudged doodles reign supreme.
+      <p className="font-comic text-bart-black/90 mt-3">
+        $BART is the unholy shrine of shitpost art, where stick figures and smudged
+        doodles reign supreme.
       </p>
-      <p className="mt-3 font-comic text-bart-black/90">
+      <p className="font-comic text-bart-black/90 mt-3">
         No pretentious galleries here—just raw, unfiltered creativity.
       </p>
-      <p className="mt-3 font-comic text-bart-black">
-        Upload your worst, vote for chaos, and join the cult of imperfection. Coming soon to ruin the internet.
+      <p className="font-comic text-bart-black mt-3">
+        Upload your worst, vote for chaos, and join the cult of imperfection. Coming soon
+        to ruin the internet.
       </p>
     </Section>
   );

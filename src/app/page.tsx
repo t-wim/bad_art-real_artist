@@ -1,19 +1,23 @@
 // file: src/app/page.tsx  (nur relevanter Ausschnitt)
+import type { ComponentProps } from "react";
+
 import Hero from "@/components/Hero";
 import { TeaserRow } from "@/components/TeaserBanner";
-import IntroBlurb from "@/components/IntroBlurb";   
+import IntroBlurb from "@/components/IntroBlurb";
 import GalleryGrid from "@/components/gallery/GalleryGrid";
 import AboutShort from "@/components/AboutShort";
 import BelowGalleryCta from "@/components/BelowGalleryCta";
 import teasers from "@/content/teasers.json";
 
+type TeaserRowProps = ComponentProps<typeof TeaserRow>;
+
 export default function HomePage() {
   const items = [
-    { variant: "hof",    title: teasers.hof.title,    manifest: teasers.hof.manifest,    microcopy: teasers.hof.microcopy,    icon: "/icons/spotlight.svg",    backgroundTexture: "/textures/paper_grain.png" },
-    { variant: "upload", title: teasers.upload.title, manifest: teasers.upload.manifest, microcopy: teasers.upload.microcopy, icon: "/icons/upload.svg",       backgroundTexture: "/textures/neon-swipes.png" },
-    { variant: "voting", title: teasers.voting.title, manifest: teasers.voting.manifest, microcopy: teasers.voting.microcopy, icon: "/icons/sticker-plus.svg", backgroundTexture: "/textures/scribble.png" },
-    { variant: "bonus",  title: teasers.bonus.title,  manifest: teasers.bonus.manifest,  microcopy: teasers.bonus.microcopy,  icon: "/icons/lock-glitch.svg",  backgroundTexture: "/textures/paper_grain.png" }
-  ] as const;
+    { variant: "hof",    title: teasers.hof.title,    manifest: teasers.hof.manifest,    microcopy: teasers.hof.microcopy,    backgroundTexture: "/textures/paper_grain.png" },
+    { variant: "upload", title: teasers.upload.title, manifest: teasers.upload.manifest, microcopy: teasers.upload.microcopy, backgroundTexture: "/textures/neon-swipes.png" },
+    { variant: "voting", title: teasers.voting.title, manifest: teasers.voting.manifest, microcopy: teasers.voting.microcopy, backgroundTexture: "/textures/scribble.png" },
+    { variant: "bonus",  title: teasers.bonus.title,  manifest: teasers.bonus.manifest,  microcopy: teasers.bonus.microcopy,  backgroundTexture: "/textures/paper_grain.png" }
+  ] satisfies TeaserRowProps["items"];
 
   return (
     <main>
@@ -24,7 +28,7 @@ export default function HomePage() {
         <GalleryGrid />
       </section>
       <BelowGalleryCta />
-      <TeaserRow items={items as any} />
+      <TeaserRow items={items} />
     </main>
   );
 }
