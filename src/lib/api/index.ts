@@ -1,5 +1,5 @@
-// src/lib/api.ts
-import { ArtworkList, TArtworkList, TArtwork } from "./contracts";
+// src/lib/api/index.ts
+import { ArtworkList, TArtworkList, TArtwork } from "../utils/contracts";
 
 export type DataSource = "mock" | "api";
 
@@ -38,7 +38,9 @@ async function fromApi(limit = DEFAULT_LIMIT, cursor?: string): Promise<TArtwork
     const json = await res.json();
 
     const safeItems = Array.isArray(json?.items)
-      ? (json.items.map(normalizeRawArtwork).filter(Boolean) as TArtwork[])
+      ? json.items
+          .map((value: unknown): TArtwork | null => normalizeRawArtwork(value))
+          .filter((item: TArtwork | null): item is TArtwork => item !== null)
       : [];
 
     const safe: TArtworkList = {
@@ -48,9 +50,10 @@ async function fromApi(limit = DEFAULT_LIMIT, cursor?: string): Promise<TArtwork
 
     return ArtworkList.parse(safe);
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
+    console.warn("[lib/api] failed to fetch artworks", err);
     // Fallback: leere Liste statt Hard-Crash – UI bleibt renderbar
-    return ArtworkList.parse({ items: [], nextCursor: null, /* @note: error passt nicht in Schema */ } as any);
+    const fallback: TArtworkList = { items: [], nextCursor: null };
+    return ArtworkList.parse(fallback);
   } finally {
     clearTimeout(to);
   }
@@ -113,22 +116,28 @@ function cycle<T>(arr: T[], count: number, offset = 0): T[] {
 }
 
 /** ---- Normalizer: gleicht key-casing & values an den Contract an ---- */
-function normalizeRawArtwork(x: any): TArtwork | null {
-  if (!x || typeof x !== "object") return null;
+function normalizeRawArtwork(x: unknown): TArtwork | null {
+  if (!x || typeof x !== "object" || x === null) return null;
 
-  const id = x.id != null ? String(x.id) : "";
-  const title = x.title != null ? String(x.title) : "Untitled";
-  const author = x.author != null ? String(x.author) : undefined;
+  const raw = x as Record<string, unknown>;
 
-  const rawMime = (x.mime ?? x.MIME ?? x.contentType ?? "image/png").toString().toLowerCase();
-  const mime: TArtwork["mime"] =
-    rawMime.includes("jpeg") ? "image/jpeg" : rawMime.includes("webp") ? "image/webp" : "image/png";
+  const id = raw["id"] != null ? String(raw["id"]) : "";
+  const title = raw["title"] != null ? String(raw["title"]) : "Untitled";
+  const author = raw["author"] != null ? String(raw["author"]) : undefined;
 
-  // akzeptiere mehrere Quell-Keys
-  const base64 = x.imageBase64 ?? x.imagebase64 ?? x.data ?? x.base64 ?? "";
-  const imageBase64 = String(base64);
+  const mimeCandidate = raw["mime"] ?? raw["MIME"] ?? raw["contentType"] ?? "image/png";
+  const rawMime = String(mimeCandidate).toLowerCase();
+  const mime: TArtwork["mime"] = rawMime.includes("jpeg")
+    ? "image/jpeg"
+    : rawMime.includes("webp")
+      ? "image/webp"
+      : "image/png";
 
-  const createdAt = x.createdAt ? String(x.createdAt) : undefined;
+  const base64Candidate =
+    raw["imageBase64"] ?? raw["imagebase64"] ?? raw["data"] ?? raw["base64"] ?? "";
+  const imageBase64 = String(base64Candidate);
+
+  const createdAt = raw["createdAt"] ? String(raw["createdAt"]) : undefined;
 
   if (!id || !imageBase64) return null;
   return { id, title, author, mime, imageBase64, createdAt };

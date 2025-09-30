@@ -1,34 +1,28 @@
 // src/components/Section.tsx
 import React, { forwardRef } from "react";
 
-type As = React.ElementType;
-
-type Props<T extends As = "section"> = {
+type SectionProps = React.HTMLAttributes<HTMLElement> & {
   id?: string;
   className?: string;
-  as?: T;
+  as?: React.ElementType;
   children?: React.ReactNode;
-} & Omit<React.ComponentPropsWithoutRef<T>, "as" | "className" | "id" | "children">;
+};
 
-function SectionInner<T extends As = "section">(
-  { id, className = "", as, children, ...rest }: Props<T>,
-  ref: React.Ref<Element>
+const Section = forwardRef<HTMLElement, SectionProps>(function SectionInner(
+  { id, className = "", as = "section", children, ...rest },
+  ref,
 ) {
-  const Tag = (as || "section") as As;
-  return (
-    <Tag
-      ref={ref as any}
-      id={id}
-      className={`w-full max-w-[1240px] mx-auto px-4 sm:px-6 md:px-8 ${className}`}
-      {...(rest as any)}
-    >
-      {children}
-    </Tag>
+  const Tag = as;
+  return React.createElement(
+    Tag,
+    {
+      ref,
+      id,
+      className: `w-full max-w-[1240px] mx-auto px-4 sm:px-6 md:px-8 ${className}`,
+      ...rest,
+    },
+    children,
   );
-}
-
-const Section = forwardRef(SectionInner) as <T extends As = "section">(
-  p: Props<T> & { ref?: React.Ref<Element> }
-) => React.ReactElement | null;
+});
 
 export default Section;

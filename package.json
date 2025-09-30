@@ -6,13 +6,32 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --check \"**/*.{js,ts,tsx,md,mdx,json}\"",
+    "format:write": "prettier --write \"**/*.{js,ts,tsx,md,mdx,json}\"",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "jobs:dry-run": "tsx scripts/dry-run-jobs.ts",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:generate": "cross-env PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1 prisma generate",
+    "prisma:studio": "prisma studio",
+    "prepare": "husky install"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.9.0",
+    "@prisma/client": "^5.21.1",
+    "@radix-ui/react-slot": "^1.1.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
     "framer-motion": "^12.23.16",
+    "lucide-react": "^0.453.0",
     "next": "^15.0.0",
+    "next-auth": "^5.0.0-beta.20",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.53.0",
+    "tailwind-merge": "^2.5.2",
+    "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.9.2",
     "zod": "^4.1.9"
   },
@@ -21,9 +40,36 @@
     "@types/node": "24.5.2",
     "@types/react": "19.1.13",
     "autoprefixer": "^10.0.0",
+    "cross-env": "^7.0.3",
     "eslint": "9.0.0",
     "eslint-config-next": "^15.0.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.10",
     "postcss": "^8.0.0",
-    "tailwindcss": "^4.1.13"
+    "prettier": "^3.3.3",
+    "prettier-plugin-prisma": "^5.0.0",
+    "prettier-plugin-tailwindcss": "^0.6.8",
+    "prisma": "^5.21.1",
+    "tailwindcss": "^4.1.13",
+    "tsx": "^4.19.2",
+    "vitest": "^2.1.4"
+  },
+  "lint-staged": {
+    "src/lib/**/*.{ts,tsx}": [
+      "pnpm exec next lint --fix --file"
+    ],
+    "*.{js,ts,tsx}": [
+      "prettier --write"
+    ],
+    "*.{md,mdx,json,css}": [
+      "prettier --write"
+    ]
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma"
+    ]
   }
 }

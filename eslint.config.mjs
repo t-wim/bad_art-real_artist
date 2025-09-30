@@ -19,6 +19,16 @@ const eslintConfig = [
       "build/**",
       "next-env.d.ts",
     ],
+    linterOptions: {
+      reportUnusedDisableDirectives: true,
+    },
+  },
+  {
+    files: ["src/components/dev/**/*.{ts,tsx}"],
+    rules: {
+      "@next/next/no-img-element": "off",
+      "@typescript-eslint/no-explicit-any": "warn",
+    },
   },
 ];
 

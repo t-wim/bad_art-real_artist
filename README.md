@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## $BART – Bad Art / Real Artist Platform
 
-## Getting Started
+This repository hosts the Next.js 15 + TailwindCSS v4 application that powers **$BART** – the tongue-in-cheek meme/meta-art arena for chaotic artists. The stack embraces the App Router, shadcn/ui primitives, Prisma for data, and X (Twitter) OAuth for authentication.
 
-First, run the development server:
+The implementation roadmap follows the requirements captured in `/docs/moodboard-check.md` and the subsequent architecture briefs inside `agents/`.
+
+## Tooling Overview
+
+- **Next.js 15** with the App Router and React 19.
+- **TailwindCSS v4** with custom theming that mirrors the $BART palette.
+- **shadcn/ui** component primitives (via `@radix-ui/react-slot`, `class-variance-authority`, `tailwind-merge`, etc.).
+- **Prisma** with SQLite for local development and Postgres planned for production deployments.
+- **NextAuth (Auth.js v5 beta)** for X login (scaffolding in progress).
+- **Husky + lint-staged** to enforce linting & formatting before every commit.
+
+## Prerequisites
+
+- Node.js 20+
+- pnpm 10.5 (the repo is configured for pnpm; other package managers are not supported).
+
+## Quick Start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+# Install dependencies
+pnpm install
+
+# Copy and adjust environment variables
+cp .env.example .env
+
+# (Optional) Allow Prisma to skip checksum validation when running offline
+export PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1
+
+# Run the initial database migration (generates prisma/migrations and dev.db)
+pnpm prisma:migrate --name init
+
+# Launch the development server
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit [http://localhost:3000](http://localhost:3000) to explore the current build.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command                | Description                                     |
+| ---------------------- | ----------------------------------------------- |
+| `pnpm dev`             | Start the Next.js development server.           |
+| `pnpm build`           | Build the production bundle.                    |
+| `pnpm start`           | Serve the production build.                     |
+| `pnpm lint`            | Run ESLint (Next.js rules).                     |
+| `pnpm typecheck`       | Validate TypeScript types.                      |
+| `pnpm format`          | Check formatting with Prettier.                 |
+| `pnpm format:write`    | Apply Prettier formatting fixes.                |
+| `pnpm prisma:migrate`  | Run `prisma migrate dev` (accepts `--name`).    |
+| `pnpm prisma:generate` | Regenerate the Prisma Client.                   |
+| `pnpm prisma:studio`   | Open Prisma Studio against the local SQLite DB. |
 
-## Learn More
+## Environment Variables
 
-To learn more about Next.js, take a look at the following resources:
+Environment keys are documented in `.env.example`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+NEXTAUTH_SECRET=replace-me-with-32chars
+DATABASE_URL=file:./prisma/dev.db
+X_CLIENT_ID=...
+X_CLIENT_SECRET=...
+X_BEARER=...
+NEXTAUTH_URL=http://localhost:3000
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The default development profile uses SQLite (`file:./prisma/dev.db`). Configure a Postgres connection string for production deployments.
 
-## Deploy on Vercel
+## Continuous Integration
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+GitHub Actions (`.github/workflows/ci.yml`) installs dependencies, runs Prisma client generation, and executes linting and type checks for every push and pull request.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes on Local Prisma Usage
+
+- The environment used to author this commit blocks direct downloads of Prisma engines, which may require setting `PRISMA_ENGINES_CHECKSUM_IGNORE_MISSING=1` before running `pnpm prisma:*` commands.
+- The initial migration SQL can be found under `prisma/migrations/20241011000000_init/`.
+
+## Project Status
+
+Implementation work has just started. Follow-up tasks include wiring up Auth.js for X OAuth, the submission & voting flows, telemetry, and automated X-posting per milestone.
